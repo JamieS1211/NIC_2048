@@ -12,8 +12,8 @@ import java.util.function.Supplier;
 public class AgentEvaluation {
 	public static void main(String[] args) {
 		int action_time_limit_ms = 1000;
-		int num_games = 10000;
-		String random_seed = "1234";
+		int num_games = 1000;
+		String random_seed = "1284";
 
 		final Supplier<Agent> AGENT = createAgentFactoryByReflection();
 		final int REPEATS = num_games;
@@ -27,6 +27,7 @@ public class AgentEvaluation {
 	}
 
 	private static Supplier<Agent> createAgentFactoryByReflection() {
-		return () -> new CustomAgent();
+		GeneticAgent agent = new GeneticAgent();
+		return () -> agent;
 	}
 }

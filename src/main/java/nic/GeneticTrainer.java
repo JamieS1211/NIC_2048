@@ -26,8 +26,8 @@ public class GeneticTrainer {
 	public static final int EVO_RANDOM_SEED = 27;
 	public static final int GAME_RANDOM_SEED = 123;
 	
-	public static final int POPULATION_SIZE = 1000;
-	public static final int NUM_GENERATIONS = 1000;
+	public static final int POPULATION_SIZE = 3000;
+	public static final int NUM_GENERATIONS = 100;
 	public static final int GAMES_PLAYED = 50;
 	public static final int INITIAL_NUM_RULES = 200;
 	
@@ -36,10 +36,11 @@ public class GeneticTrainer {
 	public static final Duration ACTION_TIME_LIMIT = Duration.ofNanos(1000 * 1000);
 	
 	public static DecimalFormat df = new DecimalFormat("#.##");
-
 	
 	public static void main(String[] args) throws IOException {
 		RandomDataGenerator randomEvo  = new RandomDataGenerator(new MersenneTwister(EVO_RANDOM_SEED));
+		RandomDataGenerator randomGame = new RandomDataGenerator(new MersenneTwister(GAME_RANDOM_SEED));
+
 		final SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss");
 		
 	    FileWriter fileWriter = new FileWriter("run.tsv");
@@ -48,11 +49,13 @@ public class GeneticTrainer {
 		GeneticAgent[] population = new GeneticAgent[POPULATION_SIZE];
 		// Initialize population
 		for(int i = 0; i < POPULATION_SIZE; i++) {
-			ArrayList<Rule> rules = new ArrayList<Rule>(INITIAL_NUM_RULES);
-			for(int j = 0; j < INITIAL_NUM_RULES; j++) {
-				rules.add(Rule.randomRule(PATTERN_SIZE, 4, randomEvo));
-			}
-			population[i] = new GeneticAgent(rules);
+//			ArrayList<Rule> rules = new ArrayList<Rule>(INITIAL_NUM_RULES);
+//			for(int j = 0; j < INITIAL_NUM_RULES; j++) {
+//				rules.add(Rule.randomRule(PATTERN_SIZE, 4, randomEvo));
+//			}
+			population[i] = new GeneticAgent();
+			mutate(population[i].rules, randomEvo);
+			mutate(population[i].rules, randomEvo);
 		}
 
 		{
@@ -74,8 +77,6 @@ public class GeneticTrainer {
 			GeneticAgent[] currentPopulation = population;
 			IntStream.range(0, populationSize).parallel().forEach( i -> {
 				Game game = new Game(ACTION_TIME_LIMIT);
-				RandomDataGenerator randomGame = new RandomDataGenerator(new MersenneTwister(GAME_RANDOM_SEED));
-
 				MultipleGamesResult result = game.playMultiple(constantSupplier(currentPopulation[i]), GAMES_PLAYED, randomGame);
 				
 				// double score = result.getScore().getMean();
