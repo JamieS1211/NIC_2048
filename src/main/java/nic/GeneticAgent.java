@@ -1,5 +1,9 @@
 package nic;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +25,20 @@ public class GeneticAgent implements Agent {
 	
 	public GeneticAgent() {
 		this.rules = new ArrayList<Rule>();
+		FileInputStream fileInputStream;
+		try {
+			fileInputStream = new FileInputStream("ruleset.bin");
+			ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+			this.rules = (ArrayList<Rule>) objectInputStream.readObject();
+			objectInputStream.close(); 
+		} catch (IOException | ClassNotFoundException e) {
+			this.rules = new ArrayList<Rule>();
+			e.printStackTrace();
+		}
+	}
+
+	public GeneticAgent(ArrayList<Rule> rules) {
+		this.rules = rules;
 	}
 
 	public Action chooseAction(Board board, List<Action> possibleActions, Duration maxTime) {

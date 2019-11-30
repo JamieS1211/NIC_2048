@@ -1,15 +1,17 @@
 package nic;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.io.Serializable;
 
 import org.apache.commons.math3.random.RandomDataGenerator;
 
-import put.ci.cevo.util.RandomUtils;
 import put.game2048.Board;
 
-public class Rule {
+public class Rule implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public int[][] pattern;
 	public double[] scoreChange;
 	
