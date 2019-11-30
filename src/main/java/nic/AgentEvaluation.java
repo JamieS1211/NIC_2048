@@ -12,17 +12,17 @@ import java.util.function.Supplier;
 public class AgentEvaluation {
 	public static void main(String[] args) {
 		int action_time_limit_ms = 1000;
-		int num_games = 10;
+		int num_games = 10000;
 		String random_seed = "1234";
 
-			final Supplier<Agent> AGENT = createAgentFactoryByReflection();
-			final int REPEATS = num_games;
-			final Duration ACTION_TIME_LIMIT = Duration.ofNanos(action_time_limit_ms * 1000 * 1000);
-			final long RANDOM_SEED = Long.parseLong(random_seed);
+		final Supplier<Agent> AGENT = createAgentFactoryByReflection();
+		final int REPEATS = num_games;
+		final Duration ACTION_TIME_LIMIT = Duration.ofNanos(action_time_limit_ms * 1000 * 1000);
+		final long RANDOM_SEED = Long.parseLong(random_seed);
 
-			RandomDataGenerator random = new RandomDataGenerator(new MersenneTwister(RANDOM_SEED));
-			MultipleGamesResult result = new Game(ACTION_TIME_LIMIT).playMultiple(AGENT, REPEATS, random);
-			System.out.println(result.toCvsRow());
+		RandomDataGenerator random = new RandomDataGenerator(new MersenneTwister(RANDOM_SEED));
+		MultipleGamesResult result = new Game(ACTION_TIME_LIMIT).playMultiple(AGENT, REPEATS, random);
+		System.out.println(result.toCvsRow());
 
 	}
 
