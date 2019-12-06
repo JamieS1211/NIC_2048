@@ -2,7 +2,7 @@ package put.game2048;
 
 import java.time.Duration;
 
-import nic.CustomAgent;
+import put.nic.CustomAgent;
 import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.commons.math3.random.RandomDataGenerator;
 import org.junit.Assert;
