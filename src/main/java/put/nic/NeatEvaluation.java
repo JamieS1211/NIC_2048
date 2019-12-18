@@ -16,10 +16,16 @@ public class NeatEvaluation {
 		RandomDataGenerator random = new RandomDataGenerator(new MersenneTwister(RANDOM_SEED));
 
 		//Setup constants
-		final int generations = 100;
+		final int generations = 250;
 		final int generationSize = 250;
-		final int gamesPerBrain = 10;
+		final int gamesPerBrain = 50;
 		final int[] brainLayerSizes = {16, 32, 4}; // Rule of thump, input size * output size / 2
+
+		//Running values of best brain
+		int[] bestBrain = new int[2];
+		double bestBrainFitness = 0;
+		double[] bestBrainRealScore = new double[generations];
+
 
 		//Running tally of population
 		Brain[][] brains = new Brain[generations][generationSize];
@@ -35,7 +41,7 @@ public class NeatEvaluation {
 
 		//Simulate
 		for (int generation = 0; generation < generations; generation++) {
-			int maxMoves = 50;
+			int maxMoves = 100;
 			int totalFitness = 0;
 
 			//Simulate game
@@ -53,6 +59,12 @@ public class NeatEvaluation {
 
 				averageScores[generation][brainIndex] = tally / gamesPerBrain;
 				totalFitness += averageScores[generation][brainIndex];
+
+				if (averageScores[generation][brainIndex] > bestBrainFitness) {
+					bestBrainFitness = averageScores[generation][brainIndex];
+					bestBrain[0] = generation;
+					bestBrain[1] = brainIndex;
+				}
 			}
 
 			if (generation < generations - 1) {
@@ -78,6 +90,15 @@ public class NeatEvaluation {
 			for (int i = 0; i < averageScores[generation].length; i++) {
 				generationalAverages[generation] += averageScores[generation][i] / averageScores[generation].length;
 			}
+
+			//Run current best brain for some games
+			double tally = 0;
+			final Supplier<Agent> AGENT = () -> new CustomAgent(brains[bestBrain[0]][bestBrain[1]]);
+			for (int game = 0; game < gamesPerBrain; game++) {
+				GameResult result = new GameSimulation(ACTION_TIME_LIMIT).playSingle(AGENT, random, -1);
+				tally += result.getScore();
+			}
+			bestBrainRealScore[generation] = tally / gamesPerBrain;
 		}
 
 

@@ -25,6 +25,7 @@ public class GameSimulation {
 		this.actionTimeLimitSoft = actionTimeLimit;
 	}
 
+	// If max moves is given as -1 play the full game
 	public GameResult playSingle(Supplier<Agent> agentSupplier, RandomDataGenerator random, int maxMoves) {
 		Preconditions.checkNotNull(agentSupplier);
 		Preconditions.checkNotNull(random);
@@ -43,7 +44,7 @@ public class GameSimulation {
 
 				State2048 state = sampleInitialStateDistribution(random);
 				List<Action2048> actions = getPossibleActions(state);
-				while (!actions.isEmpty() && moves < maxMoves) {
+				while (!actions.isEmpty() && (maxMoves == -1 || moves < maxMoves)) {
 					moves++;
 
 					//Put state evaluation here
@@ -57,8 +58,11 @@ public class GameSimulation {
 					actions = getPossibleActions(state);
 				}
 
-				//return new Pair<>(sumRewards, state.getMaxTile());
-				return new Pair<>(fitness, state.getMaxTile());
+				if (maxMoves == -1) {
+					return new Pair<>(sumRewards, state.getMaxTile());
+				} else {
+					return new Pair<>(fitness, state.getMaxTile());
+				}
 			}
 		};
 
