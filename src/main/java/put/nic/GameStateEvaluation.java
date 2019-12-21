@@ -3,57 +3,51 @@ package put.nic;
 import put.game2048.Board;
 
 import static java.lang.Math.abs;
+import static nic.Utils.printBoard;
+import static put.ci.cevo.games.game2048.State2048.REWARDS;
 
 public class GameStateEvaluation {
     /**
-     * Function that evaluates how good a board state is. High is good.
+     * Function that evaluates how good a board state is. High is good, between 0 and 1.
      *
      * @param board
      * @return
      */
     public static int getGameStateScore(Board board) {
-        int currentCellValue;
-        int testTileValue;
+        double currentCellValue, rightCellValue, belowCellValue;
+        double verticalDifference, horizontalDifference;
         int highestPossibleScore = 0;
         int gameStateScore = 0;
 
         for (int row = 0; row < 4; row++) {
-            for (int column = 0; column< 4; column++) {
-                currentCellValue = board.getValue(row, column);
+            for (int column = 0; column < 4; column++) {
+                currentCellValue = REWARDS[board.getValue(row, column)];
 
-                if (currentCellValue != 0) {
-                    //Multiplied by 2 to simulate checking both sides
-                    highestPossibleScore += 2 * (2 ^ currentCellValue);
-                }
+                // Simulate checking above, below, left and right
+                highestPossibleScore += currentCellValue * 4;
 
-                //Check down
+                // Check below connection if present
                 if (row + 1 < 4) {
-                    testTileValue = board.getValue( row + 1, column);
+                    belowCellValue = REWARDS[board.getValue(row + 1, column)];
+                    verticalDifference = abs(currentCellValue - belowCellValue);
 
-                    if (testTileValue != 0) {
-                        if (currentCellValue != 0) {
-                            gameStateScore += abs((2 ^ currentCellValue) - (2 ^ testTileValue));
-                        } else {
-                            gameStateScore += 2 ^ testTileValue;
-                        }
-                    }
+                    gameStateScore += verticalDifference;
                 }
 
-                //Check right
+                // Check right connection if present
                 if (column + 1 < 4) {
-                    testTileValue = board.getValue( row, column + 1);
+                    rightCellValue = REWARDS[board.getValue(row, column + 1)];
+                    horizontalDifference = abs(currentCellValue - rightCellValue);
 
-                    if (testTileValue != 0) {
-                        if (currentCellValue != 0) {
-                            gameStateScore += abs((2 ^ currentCellValue) - (2 ^ testTileValue));
-                        } else {
-                            gameStateScore += 2 ^ testTileValue;
-                        }
-                    }
+                    gameStateScore += horizontalDifference;
                 }
             }
         }
 
-        return highestPossibleScore - gameStateScore;
+        if (highestPossibleScore == 0) {
+            return 1;
+        } else {
+            return highestPossibleScore - gameStateScore;
+        }
     }
 }
