@@ -24,14 +24,19 @@ public class GameStateEvaluation {
                 currentCellValue = REWARDS[board.getValue(row, column)];
 
                 // Simulate checking above, below, left and right
-                highestPossibleScore += currentCellValue * 4;
+                highestPossibleScore += currentCellValue * 2; // above / below
+                highestPossibleScore += currentCellValue * 2 * 2; // left / right - double to encourage lining up left to right
 
                 // Check below connection if present
                 if (row + 1 < 4) {
                     belowCellValue = REWARDS[board.getValue(row + 1, column)];
                     verticalDifference = abs(currentCellValue - belowCellValue);
 
-                    gameStateScore += verticalDifference;
+                    if (belowCellValue == 0) {
+                        gameStateScore += verticalDifference * 2; // Encourage AI to murge tiles
+                    } else {
+                        gameStateScore += verticalDifference;
+                    }
                 }
 
                 // Check right connection if present
@@ -39,7 +44,12 @@ public class GameStateEvaluation {
                     rightCellValue = REWARDS[board.getValue(row, column + 1)];
                     horizontalDifference = abs(currentCellValue - rightCellValue);
 
-                    gameStateScore += horizontalDifference;
+                    // double to encourage lining up left to right
+                    if (rightCellValue == 0) {
+                        gameStateScore += horizontalDifference * 2 * 2;
+                    } else {
+                        gameStateScore += horizontalDifference * 2;
+                    }
                 }
             }
         }
