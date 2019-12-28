@@ -26,10 +26,10 @@ public class GeneticTrainer {
 	public static final int EVO_RANDOM_SEED = 27;
 	public static final int GAME_RANDOM_SEED = 123;
 	
-	public static final int POPULATION_SIZE = 3000;
+	public static final int POPULATION_SIZE = 10000;
+	public static final int NUM_MUTATIONS = 10;
 	public static final int NUM_GENERATIONS = 100;
 	public static final int GAMES_PLAYED = 50;
-	public static final int INITIAL_NUM_RULES = 200;
 	
 	public static final int PATTERN_SIZE = 2;
 	
@@ -39,7 +39,6 @@ public class GeneticTrainer {
 	
 	public static void main(String[] args) throws IOException {
 		RandomDataGenerator randomEvo  = new RandomDataGenerator(new MersenneTwister(EVO_RANDOM_SEED));
-		RandomDataGenerator randomGame = new RandomDataGenerator(new MersenneTwister(GAME_RANDOM_SEED));
 
 		final SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss");
 		
@@ -49,13 +48,7 @@ public class GeneticTrainer {
 		GeneticAgent[] population = new GeneticAgent[POPULATION_SIZE];
 		// Initialize population
 		for(int i = 0; i < POPULATION_SIZE; i++) {
-//			ArrayList<Rule> rules = new ArrayList<Rule>(INITIAL_NUM_RULES);
-//			for(int j = 0; j < INITIAL_NUM_RULES; j++) {
-//				rules.add(Rule.randomRule(PATTERN_SIZE, 4, randomEvo));
-//			}
-			population[i] = new GeneticAgent();
-			mutate(population[i].rules, randomEvo);
-			mutate(population[i].rules, randomEvo);
+			population[i] = GeneticAgent.makeRandom(randomEvo);
 		}
 
 		{
@@ -77,7 +70,9 @@ public class GeneticTrainer {
 			GeneticAgent[] currentPopulation = population;
 			IntStream.range(0, populationSize).parallel().forEach( i -> {
 				Game game = new Game(ACTION_TIME_LIMIT);
-				MultipleGamesResult result = game.playMultiple(constantSupplier(currentPopulation[i]), GAMES_PLAYED, randomGame);
+				RandomDataGenerator randomGame = new RandomDataGenerator(new MersenneTwister());
+
+				MultipleGamesResult result = game.playMultiple(Utils.constantSupplier(currentPopulation[i]), GAMES_PLAYED, randomGame);
 				
 				// double score = result.getScore().getMean();
 				double consistentScore = result.getScore().getMean() -
@@ -103,7 +98,7 @@ public class GeneticTrainer {
 				}
 				FileOutputStream fileOutputStream = new FileOutputStream("ruleset.bin");
 				ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
-				objectOutputStream.writeObject(population[argmax].rules);
+				objectOutputStream.writeObject(population[argmax].lineMap);
 				objectOutputStream.flush();
 				objectOutputStream.close();
 			}
@@ -148,37 +143,14 @@ public class GeneticTrainer {
 					mom = population[POPULATION_SIZE-1];
 				}
 				
-				nextGen[i] = new GeneticAgent();
-				nextGen[i].rules = crossover(mom.rules, dad.rules, randomEvo);
-				mutate(nextGen[i].rules, randomEvo);
+				nextGen[i] = GeneticAgent.crossover(mom.lineMap, dad.lineMap, randomEvo);
+				for(int k = 0; k < NUM_MUTATIONS; k++) {
+					GeneticAgent.mutate(nextGen[i], randomEvo);
+				}
 			}
 			population = nextGen;
 		}
 		printWriter.close();
 	}
 	
-	public static List<Rule> crossover(List<Rule> dad, List<Rule> mom, RandomDataGenerator random) {
-		// RandomUtils.shuffle(dad, random);
-		// RandomUtils.shuffle(mom, random);
-		// Keep at least 10 rules from each parent
-		int crossover_point = random.nextInt(10, mom.size()-10);
-		// int mom_crossover_point = random.nextInt(mom.size()-10, mom.size()-10);
-		
-		List<Rule> child = new ArrayList<Rule>(mom.size());
-		
-		child.addAll(dad.subList(0, crossover_point));
-		child.addAll(mom.subList(crossover_point, mom.size()));
-		
-		return child;
-	}
-	
-	public static void mutate(List<Rule> original, RandomDataGenerator random) {
-		int mutationPoint = random.nextInt(0,  original.size()-1);
-		original.set(mutationPoint, Rule.randomRule(PATTERN_SIZE, 4, random));
-	}
-	
-	private static Supplier<Agent> constantSupplier(Agent agent) {
-		/** A Supplier that always returns the same agent, works only for stateless agents */
-		return () -> agent;
-	}
 }

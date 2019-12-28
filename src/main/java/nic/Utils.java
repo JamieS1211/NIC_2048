@@ -1,7 +1,10 @@
 package nic;
 
+import java.util.function.Supplier;
+
 import put.ci.cevo.games.game2048.State2048;
 import put.game2048.Action;
+import put.game2048.Agent;
 import put.game2048.Board;
 
 public class Utils {
@@ -103,4 +106,8 @@ public class Utils {
 		return null;
 	}
 
+	public static Supplier<Agent> constantSupplier(Agent agent) {
+		/** A Supplier that always returns the same agent, works only for stateless agents */
+		return () -> agent;
+	}
 }
