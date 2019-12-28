@@ -1,0 +1,15 @@
+name: Train and Test
+
+on:
+  push:
+    branches:
+      - "evo-lookup"
+
+jobs:
+  build-and-run:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Build Trainer
+      run: mvn -f pom_trainer.xml package
+    - name: Run the Training
+      run: java -jar target/Trainer-1.0-jar-with-dependencies.jar
