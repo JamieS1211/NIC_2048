@@ -29,7 +29,7 @@ public class GeneticAgent implements Agent {
 		// this.lineMap = new float[NSTATES * NSTATES * NSTATES * NSTATES];
 		FileInputStream fileInputStream;
 		try {
-			fileInputStream = new FileInputStream("lineMap.bin");
+			fileInputStream = new FileInputStream("ruleset.bin");
 			ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
 			this.lineMap = (float[]) objectInputStream.readObject();
 			objectInputStream.close(); 
