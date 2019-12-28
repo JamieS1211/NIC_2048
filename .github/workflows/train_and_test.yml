@@ -17,4 +17,4 @@ jobs:
     - name: Run the Training
       run: |
         cd $GITHUB_WORKSPACE
-        java -jar target/Trainer-1.0-jar-with-dependencies.jar
+        java -Xms2G -Xmx6G  -jar target/Trainer-1.0-jar-with-dependencies.jar
