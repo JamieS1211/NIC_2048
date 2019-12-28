@@ -18,3 +18,12 @@ jobs:
       run: |
         cd $GITHUB_WORKSPACE
         java -Xms2G -Xmx6G  -jar target/Trainer-1.0-jar-with-dependencies.jar
+    - name: Plot the Run
+      run: |
+        sudo apt install gnuplot
+        cd $GITHUB_WORKSPACE
+        gnuplot plot.gnu
+    - uses: actions/upload-artifact@v1
+      with:
+        name: Run Summary
+        path: plot.png
