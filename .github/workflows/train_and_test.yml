@@ -9,7 +9,12 @@ jobs:
   build-and-run:
     runs-on: ubuntu-latest
     steps:
+    - uses: actions/checkout@v1
     - name: Build Trainer
-      run: mvn -f pom_trainer.xml package
+      run: |
+        cd $GITHUB_WORKSPACE
+        mvn -f pom_trainer.xml package
     - name: Run the Training
-      run: java -jar target/Trainer-1.0-jar-with-dependencies.jar
+      run: |
+        cd $GITHUB_WORKSPACE
+        java -jar target/Trainer-1.0-jar-with-dependencies.jar
