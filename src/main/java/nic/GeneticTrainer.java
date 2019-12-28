@@ -27,8 +27,8 @@ public class GeneticTrainer {
 	public static final int GAME_RANDOM_SEED = 123;
 	
 	public static final int POPULATION_SIZE = 300;
-	public static final int NUM_MUTATIONS = 10;
-	public static final int NUM_GENERATIONS = 1000;
+	public static final int NUM_MUTATIONS = 128;
+	public static final int NUM_GENERATIONS = 5000;
 	public static final int GAMES_PLAYED = 50;
 	
 	public static final int PATTERN_SIZE = 2;
