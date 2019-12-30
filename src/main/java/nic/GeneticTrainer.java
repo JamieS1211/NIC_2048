@@ -26,7 +26,7 @@ public class GeneticTrainer {
 	public static final int EVO_RANDOM_SEED = 27;
 	public static final int GAME_RANDOM_SEED = 123;
 	
-	public static final int POPULATION_SIZE = 300;
+	public static final int POPULATION_SIZE = 1000;
 	public static final int NUM_MUTATIONS = 2048; // :)
 	public static final int NUM_GENERATIONS = 10000;
 	public static final int GAMES_PLAYED = 30;
@@ -72,11 +72,10 @@ public class GeneticTrainer {
 
 				MultipleGamesResult result = game.playMultiple(Utils.constantSupplier(currentPopulation[i]), GAMES_PLAYED, randomGame);
 				
-				// double score = result.getScore().getMean();
 				double consistentScore = result.getScore().getMean() -
 						1.96 * result.getScore().getStandardDeviation() / Math.sqrt(GAMES_PLAYED);
 				
-				double currentFitness = consistentScore / 2000;// Math.pow(consistentScore / 2000, );
+				double currentFitness = Math.pow(consistentScore / 2000, 4);
 				
 				fitness[i] = currentFitness;
 				summary.addValue(currentFitness);
