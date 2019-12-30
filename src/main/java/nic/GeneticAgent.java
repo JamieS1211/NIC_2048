@@ -26,7 +26,6 @@ public class GeneticAgent implements Agent {
 	
 	
 	public GeneticAgent() {
-		// this.lineMap = new float[NSTATES * NSTATES * NSTATES * NSTATES];
 		FileInputStream fileInputStream;
 		try {
 			fileInputStream = new FileInputStream("ruleset.bin");

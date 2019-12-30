@@ -28,11 +28,9 @@ public class GeneticTrainer {
 	
 	public static final int POPULATION_SIZE = 300;
 	public static final int NUM_MUTATIONS = 2048; // :)
-	public static final int NUM_GENERATIONS = 5000;
-	public static final int GAMES_PLAYED = 50;
-	
-	public static final int PATTERN_SIZE = 2;
-	
+	public static final int NUM_GENERATIONS = 10000;
+	public static final int GAMES_PLAYED = 30;
+
 	public static final Duration ACTION_TIME_LIMIT = Duration.ofNanos(1000 * 1000);
 	
 	public static DecimalFormat df = new DecimalFormat("#.##");
@@ -78,11 +76,11 @@ public class GeneticTrainer {
 				double consistentScore = result.getScore().getMean() -
 						1.96 * result.getScore().getStandardDeviation() / Math.sqrt(GAMES_PLAYED);
 				
-				double currentFitness = Math.pow(consistentScore / 2000, 12);
+				double currentFitness = consistentScore / 2000;// Math.pow(consistentScore / 2000, );
 				
 				fitness[i] = currentFitness;
 				summary.addValue(currentFitness);
-				summaryScore.addValue(consistentScore);
+				summaryScore.addValue(result.getScore().getMean());
 				summaryTime.addValue(result.getActionDurationNanos().getMean() / 1e6);
 			});
 			
