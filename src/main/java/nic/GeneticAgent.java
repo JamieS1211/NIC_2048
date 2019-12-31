@@ -3,6 +3,8 @@ package nic;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,73 +18,119 @@ import put.game2048.Action;
 import put.game2048.Agent;
 import put.game2048.Board;
 
-public class GeneticAgent implements Agent {
+public class GeneticAgent implements Agent, Serializable {
+	private static final long serialVersionUID = 1L;
 	public RandomDataGenerator random = new RandomDataGenerator(new MersenneTwister(123));
 	public static Action[] ACTIONS = { Action.UP, Action.RIGHT, Action.DOWN, Action.LEFT };
 	public static final int NSTATES = 13;
 	public static final int N = NSTATES * NSTATES * NSTATES * NSTATES;
 	
-	public float[] lineMap;
-	
+	public float[] horizontal;
+	public float[] vertical;
+	public float[] squares;
 	
 	public GeneticAgent() {
 		FileInputStream fileInputStream;
 		try {
 			fileInputStream = new FileInputStream("ruleset.bin");
 			ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
-			this.lineMap = (float[]) objectInputStream.readObject();
+			GeneticAgent readAgent = (GeneticAgent) objectInputStream.readObject();
+			this.horizontal = readAgent.horizontal;
+			this.vertical   = readAgent.vertical;
+			this.squares    = readAgent.squares;
 			objectInputStream.close(); 
 		} catch (IOException | ClassNotFoundException e) {
-			this.lineMap = new float[NSTATES * NSTATES * NSTATES * NSTATES];
+			this.horizontal = new float[N];
+			this.vertical   = new float[N];
+			this.squares    = new float[N];
 			e.printStackTrace();
 		}
 	}
 
-	public GeneticAgent(float[] lineMap) {
-		this.lineMap = lineMap;
+	public GeneticAgent(float[] horizontal, float[] vertical, float[] squares) {
+		this.horizontal = horizontal;
+		this.vertical   = vertical;
+		this.squares    = squares;
 	}
 	
 	public static GeneticAgent makeRandom(RandomDataGenerator rand) {
-		float[] lineMap = new float[N];
+		float[] horizontal = new float[N];
+		float[] vertical   = new float[N];
+		float[] squares    = new float[N];
 		for(int j = 0; j < N; j++) {
-			lineMap[j] = (float) rand.nextGaussian(0, 1);
+			horizontal[j] = (float) rand.nextGaussian(0, 1);
+			vertical[j] = (float) rand.nextGaussian(0, 1);
+			squares[j] = (float) rand.nextGaussian(0, 1);
 		}
-		return new GeneticAgent(lineMap);
+		return new GeneticAgent(horizontal, vertical, squares);
 	}
 
 	public static void mutate(GeneticAgent individual, RandomDataGenerator rand) {
-		int mutationPoint = rand.nextInt(0, N-1);
-		individual.lineMap[mutationPoint] += rand.nextGaussian(0, 1);
+		{
+			int mutationPoint = rand.nextInt(0, N-1);
+			individual.horizontal[mutationPoint] += rand.nextGaussian(0, 1);
+		}
+		{
+			int mutationPoint = rand.nextInt(0, N-1);
+			individual.vertical[mutationPoint] += rand.nextGaussian(0, 1);
+		}
+		{
+			int mutationPoint = rand.nextInt(0, N-1);
+			individual.squares[mutationPoint] += rand.nextGaussian(0, 1);
+		}
 	}
 	
 	
-	public static GeneticAgent crossover(float[] mom, float[] dad, RandomDataGenerator rand) {
-		float[] child = new float[N];
+	public static GeneticAgent crossover(GeneticAgent mom, GeneticAgent dad, RandomDataGenerator rand) {
+		float[] child_horizontal = new float[N];
+		float[] child_vertical   = new float[N];
+		float[] child_squares    = new float[N];
 		// Use binomial distribution to have most of the crossover points close to the middle
-		int crossoverPoint = rand.nextBinomial(N-1, 0.5);
-		System.arraycopy(mom, 0, child, 0, crossoverPoint);
-		System.arraycopy(dad, crossoverPoint, child, crossoverPoint, N-crossoverPoint);
+		// int crossoverPoint = rand.nextBinomial(N-1, 0.5);
+		int crossoverPointHorizontal = rand.nextInt(0, N-1);
+		System.arraycopy(mom.horizontal, 0, child_horizontal, 0, crossoverPointHorizontal);
+		System.arraycopy(dad.horizontal, crossoverPointHorizontal,
+				child_horizontal, crossoverPointHorizontal, N-crossoverPointHorizontal);
+
+		int crossoverPointVertical = rand.nextInt(0, N-1);
+		System.arraycopy(mom.vertical, 0, child_vertical, 0, crossoverPointVertical);
+		System.arraycopy(dad.vertical, crossoverPointVertical,
+				child_vertical, crossoverPointVertical, N-crossoverPointVertical);
 		
-		return new GeneticAgent(child);
+		int crossoverPointSquares = rand.nextInt(0, N-1);
+		System.arraycopy(mom.squares, 0, child_squares, 0, crossoverPointSquares);
+		System.arraycopy(dad.squares, crossoverPointSquares,
+				child_squares, crossoverPointSquares, N-crossoverPointSquares);
+		return new GeneticAgent(child_horizontal, child_vertical, child_squares);
 	}
 	
 	public float evaluate(int[][] board) {
 		float score = 0;
-		// Left-to-right and up to down
+	
+		// horizontal and vertical
 		for(int i = 0; i < 4; i++) {
-			int key1 = 0;
-			int key2 = 0;
-			int key3 = 0;
-			int key4 = 0;
+			int key_h = 0;
+			int key_v = 0;
 
 			for(int j = 0; j < 4; j++) {
-				key1 = NSTATES * key1 + board[i][j];
-				key2 = NSTATES * key2 + board[j][i];
-				key3 = NSTATES * key3 + board[3-i][j];
-				key4 = NSTATES * key4 + board[j][3-j];
+				key_h = NSTATES * key_h + board[i][j];
+				key_v = NSTATES * key_v + board[j][i];
 			}
-			score += lineMap[key1] + lineMap[key2] + lineMap[key3] + lineMap[key4];
+			score += horizontal[key_h] + vertical[key_v];
 		}
+		
+		// squares
+		for(int i = 0; i < 3; i++) {
+			for(int j = 0; j < 3; j++) {
+				int key = 0;
+				key = NSTATES * key + board[i][j];
+				key = NSTATES * key + board[i][j+1];
+				key = NSTATES * key + board[i+1][j];
+				key = NSTATES * key + board[i+1][j+1];
+				score += squares[key];
+			}
+		}
+		
 		return score;
 	}
 
@@ -114,5 +162,9 @@ public class GeneticAgent implements Agent {
 		}
 		
 		return bestAction;
+	}
+	
+	public void save(ObjectOutputStream stream) throws IOException {
+		stream.writeObject(this);
 	}
 }

@@ -8,28 +8,23 @@ import java.io.PrintWriter;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
-import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
 import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.commons.math3.random.RandomDataGenerator;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 
-import put.game2048.Agent;
 import put.game2048.Game;
 import put.game2048.MultipleGamesResult;
 
 public class GeneticTrainer {
 	public static final int EVO_RANDOM_SEED = 27;
-	public static final int GAME_RANDOM_SEED = 123;
 	
-	public static final int POPULATION_SIZE = 1000;
+	public static final int POPULATION_SIZE = 300;
 	public static final int NUM_MUTATIONS = 2048; // :)
-	public static final int NUM_GENERATIONS = 10000;
-	public static final int GAMES_PLAYED = 30;
+	public static final int NUM_GENERATIONS = 5000;
+	public static final int GAMES_PLAYED = 50;
 
 	public static final Duration ACTION_TIME_LIMIT = Duration.ofNanos(1000 * 1000);
 	
@@ -95,7 +90,7 @@ public class GeneticTrainer {
 				}
 				FileOutputStream fileOutputStream = new FileOutputStream("ruleset.bin");
 				ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
-				objectOutputStream.writeObject(population[argmax].lineMap);
+				population[argmax].save(objectOutputStream);
 				objectOutputStream.flush();
 				objectOutputStream.close();
 			}
@@ -140,7 +135,7 @@ public class GeneticTrainer {
 					mom = population[POPULATION_SIZE-1];
 				}
 				
-				nextGen[i] = GeneticAgent.crossover(mom.lineMap, dad.lineMap, randomEvo);
+				nextGen[i] = GeneticAgent.crossover(mom, dad, randomEvo);
 				for(int k = 0; k < NUM_MUTATIONS; k++) {
 					GeneticAgent.mutate(nextGen[i], randomEvo);
 				}
