@@ -23,6 +23,7 @@ public class AgentEvaluation {
 			RandomDataGenerator random = new RandomDataGenerator(new MersenneTwister(RANDOM_SEED));
 			MultipleGamesResult result = new Game(ACTION_TIME_LIMIT).playMultiple(AGENT, REPEATS, random);
 			System.out.println(result.toCvsRow());
+			
 
 	}
 

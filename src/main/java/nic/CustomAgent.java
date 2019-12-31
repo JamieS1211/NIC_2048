@@ -15,8 +15,10 @@ public class CustomAgent implements Agent {
 	public RandomDataGenerator random = new RandomDataGenerator(new MersenneTwister(123));
 
 	public Action chooseAction(Board board, List<Action> possibleActions, Duration maxTime) {
+		System.out.println(possibleActions);
 		Preconditions.checkArgument(0 < possibleActions.size());
 
+		//return (Action)RandomUtils.
 		return (Action)RandomUtils.pickRandom(possibleActions.toArray(), random);
 	}
 }
