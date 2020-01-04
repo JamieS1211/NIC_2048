@@ -7,6 +7,8 @@ public class GameResult {
 	private final int score;
 	private final int maxTile;
 	private final List<Long> actionDurationNanos;
+	private int[][][] board_states;
+	private int[] actions;
 
 	public GameResult(int scoreAchieved, int maxTileAchieved, List<Long> actionDurationNanos) {
 		this.score = scoreAchieved;
@@ -37,5 +39,22 @@ public class GameResult {
 		public GameResult build(int scoreAchieved, int maxTileAchieved) {
 			return new GameResult(scoreAchieved, maxTileAchieved, actionDurationNanos);
 		}
+	}
+	
+	public void set_actions(int[] a) {
+		this.actions = a;
+		
+	}
+	
+	public int[] get_actions(){
+		return this.actions;
+	}
+	
+	public void set_states(int[][][] s) {
+		this.board_states = s;
+		
+	}
+	public int[][][] get_states() {
+		return this.board_states;
 	}
 }

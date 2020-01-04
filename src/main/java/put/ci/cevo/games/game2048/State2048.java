@@ -1,6 +1,7 @@
 package put.ci.cevo.games.game2048;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.math3.random.RandomDataGenerator;
@@ -318,8 +319,10 @@ public class State2048 implements State {
 
 	public void printHumanReadable() {
 		for (int row = 0; row < SIZE; row++) {
+			//System.out.println(Arrays.toString(board[row]));
 			for (int col = 0; col < SIZE; col++) {
 				System.out.printf("%5d", REWARDS[board[row][col]]);
+				
 			}
 			System.out.println();
 		}

@@ -1,6 +1,9 @@
 package nic;
 
 import java.time.Duration;
+import nic.Utils;
+
+import java.util.Arrays;
 import java.util.List;
 
 import com.google.common.base.Preconditions;
@@ -12,13 +15,19 @@ import put.game2048.Agent;
 import put.game2048.Board;
 
 public class CustomAgent implements Agent {
+
+	
 	public RandomDataGenerator random = new RandomDataGenerator(new MersenneTwister(123));
 
 	public Action chooseAction(Board board, List<Action> possibleActions, Duration maxTime) {
-		System.out.println(possibleActions);
+
+		
 		Preconditions.checkArgument(0 < possibleActions.size());
 
 		//return (Action)RandomUtils.
-		return (Action)RandomUtils.pickRandom(possibleActions.toArray(), random);
+		Action act = (Action)RandomUtils.pickRandom(possibleActions.toArray(), random);
+		//System.out.println(act);
+		
+		return act; 
 	}
 }

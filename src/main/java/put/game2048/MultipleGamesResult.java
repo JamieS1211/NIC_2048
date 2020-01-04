@@ -14,6 +14,7 @@ public class MultipleGamesResult {
 	public MultipleGamesResult() {
 	}
 
+	
 	public StatisticalSummary getScore() {
 		return score;
 	}

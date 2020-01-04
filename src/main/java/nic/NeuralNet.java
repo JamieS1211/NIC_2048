@@ -1,5 +1,9 @@
 package nic;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.Arrays;
 
 public class NeuralNet {
@@ -33,10 +37,10 @@ public class NeuralNet {
 		return nn;
 	}
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws FileNotFoundException, IOException {
 		
 		//NeuralNetwork mm = setup();
-		float[] nnShape = {2,8,2};
+		float[] nnShape = {2,8,5,2};
 		float lr = (float)0.001;
 		MultLayeredNN nn = new MultLayeredNN(nnShape, lr);
 		
@@ -56,6 +60,8 @@ public class NeuralNet {
 		float[] input = {0,1};
 		float[] guess = nn.feedforward(input);
 		System.out.println(Arrays.toString(guess));
+
+		
 		
 	
 	}
