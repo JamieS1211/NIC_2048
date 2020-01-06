@@ -18,8 +18,8 @@ public class NeatEvaluation {
 		//Setup constants
 		final int generations = 250;
 		final int generationSize = 250;
-		final int gamesPerBrain = 50;
-		final int[] brainLayerSizes = {16, 32, 4}; // Rule of thump, input size * output size / 2
+		final int gamesPerBrain = 10;
+		final int[] brainLayerSizes = {16, 32, 32, 4}; // Rule of thump, input size * output size / 2
 
 		//Running values of best brain
 		int[] bestBrain = new int[2];
@@ -28,7 +28,7 @@ public class NeatEvaluation {
 
 
 		//Running tally of population
-		Brain[][] brains = new Brain[generations][generationSize];
+		MultLayeredNN[][] brains = new MultLayeredNN[generations][generationSize];
 		double[][] averageScores = new double[generations][generationSize];
 
 		//Global values
@@ -36,18 +36,18 @@ public class NeatEvaluation {
 
 		//Generate first generation of brains
 		for (int brainIndex = 0; brainIndex < generationSize; brainIndex++) {
-			brains[0][brainIndex] = new Brain(brainLayerSizes);
+			brains[0][brainIndex] = new MultLayeredNN(brainLayerSizes, 0);
 		}
 
 		//Simulate
 		for (int generation = 0; generation < generations; generation++) {
-			int maxMoves = 100;
+			int maxMoves = 50 + (generation * 3);
 			int totalFitness = 0;
 
 			//Simulate game
 			for (int brainIndex = 0; brainIndex < generationSize; brainIndex++) {
 				//Setup agent with the brain
-				Brain currentBrain = brains[generation][brainIndex];
+				MultLayeredNN currentBrain = brains[generation][brainIndex];
 				final Supplier<Agent> AGENT = () -> new CustomAgent(currentBrain);
 
 				//Average and save the score
@@ -78,7 +78,7 @@ public class NeatEvaluation {
 						cumulativeFitness += averageScores[generation][parentBrainIndex];
 
 						if (cumulativeFitness > position) {
-							brains[generation + 1][childBrainIndex] = new Brain(brains[generation][parentBrainIndex]);
+							brains[generation + 1][childBrainIndex] = new MultLayeredNN(brains[generation][parentBrainIndex]);
 							brains[generation + 1][childBrainIndex].mutate();
 							break;
 						}
