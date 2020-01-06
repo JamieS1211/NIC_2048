@@ -1,4 +1,4 @@
-package src.main.java.nic;
+package nic;
 
 import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.commons.math3.random.RandomDataGenerator;
@@ -12,8 +12,8 @@ import java.util.function.Supplier;
 public class AgentEvaluation {
 	public static void main(String[] args) {
 		int action_time_limit_ms = 1000;
-		int num_games = 1000;
-		String random_seed = "1284";
+		int num_games = 10000;
+		String random_seed = "3751565";
 
 		final Supplier<Agent> AGENT = createAgentFactoryByReflection();
 		final int REPEATS = num_games;
@@ -23,7 +23,6 @@ public class AgentEvaluation {
 		RandomDataGenerator random = new RandomDataGenerator(new MersenneTwister(RANDOM_SEED));
 		MultipleGamesResult result = new Game(ACTION_TIME_LIMIT).playMultiple(AGENT, REPEATS, random);
 		System.out.println(result.toCvsRow());
-
 	}
 
 	private static Supplier<Agent> createAgentFactoryByReflection() {
