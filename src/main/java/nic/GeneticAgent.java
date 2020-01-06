@@ -52,15 +52,19 @@ public class GeneticAgent implements Agent, Serializable {
 		this.vertical   = vertical;
 		this.squares    = squares;
 	}
+
+	private static float randomValue(RandomDataGenerator rand) {
+		return rand.nextBinomial(14, 0.5) - 7;
+	}
 	
 	public static GeneticAgent makeRandom(RandomDataGenerator rand) {
 		float[] horizontal = new float[N];
 		float[] vertical   = new float[N];
 		float[] squares    = new float[N];
 		for(int j = 0; j < N; j++) {
-			horizontal[j] = (float) rand.nextGaussian(0, 1);
-			vertical[j] = (float) rand.nextGaussian(0, 1);
-			squares[j] = (float) rand.nextGaussian(0, 1);
+			horizontal[j] = randomValue(rand);
+			vertical[j]   = randomValue(rand);
+			squares[j]    = randomValue(rand);
 		}
 		return new GeneticAgent(horizontal, vertical, squares);
 	}
@@ -68,15 +72,15 @@ public class GeneticAgent implements Agent, Serializable {
 	public static void mutate(GeneticAgent individual, RandomDataGenerator rand) {
 		{
 			int mutationPoint = rand.nextInt(0, N-1);
-			individual.horizontal[mutationPoint] += rand.nextGaussian(0, 1);
+			individual.horizontal[mutationPoint] += randomValue(rand);
 		}
 		{
 			int mutationPoint = rand.nextInt(0, N-1);
-			individual.vertical[mutationPoint] += rand.nextGaussian(0, 1);
+			individual.vertical[mutationPoint] += randomValue(rand);
 		}
 		{
 			int mutationPoint = rand.nextInt(0, N-1);
-			individual.squares[mutationPoint] += rand.nextGaussian(0, 1);
+			individual.squares[mutationPoint] += randomValue(rand);
 		}
 	}
 	
