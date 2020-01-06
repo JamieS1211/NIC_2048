@@ -67,10 +67,9 @@ public class GeneticTrainer {
 
 				MultipleGamesResult result = game.playMultiple(Utils.constantSupplier(currentPopulation[i]), GAMES_PLAYED, randomGame);
 				
-				double consistentScore = result.getScore().getMean() -
-						1.96 * result.getScore().getStandardDeviation() / Math.sqrt(GAMES_PLAYED);
+				double consistentScore = result.getScore().getMean() - result.getScore().getStandardDeviation();
 				
-				double currentFitness = Math.pow(consistentScore / 2000, 4);
+				double currentFitness = Math.pow(consistentScore / 2000, 6);
 				
 				fitness[i] = currentFitness;
 				summary.addValue(currentFitness);
