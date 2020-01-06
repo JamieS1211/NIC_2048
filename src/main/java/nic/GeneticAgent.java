@@ -72,15 +72,15 @@ public class GeneticAgent implements Agent, Serializable {
 	public static void mutate(GeneticAgent individual, RandomDataGenerator rand) {
 		{
 			int mutationPoint = rand.nextInt(0, N-1);
-			individual.horizontal[mutationPoint] += randomValue(rand);
+			individual.horizontal[mutationPoint] = randomValue(rand);
 		}
 		{
 			int mutationPoint = rand.nextInt(0, N-1);
-			individual.vertical[mutationPoint] += randomValue(rand);
+			individual.vertical[mutationPoint] = randomValue(rand);
 		}
 		{
 			int mutationPoint = rand.nextInt(0, N-1);
-			individual.squares[mutationPoint] += randomValue(rand);
+			individual.squares[mutationPoint] = randomValue(rand);
 		}
 	}
 	
