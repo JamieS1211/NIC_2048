@@ -1,5 +1,8 @@
 package nic;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 
 //import src.Matrix;
 
@@ -40,6 +43,20 @@ public class MultLayeredNN {
 		this.learning_rate = lr;
 		
 	}
+	
+	void save_network(String filename) {
+		float[][] saving_objects = this.weights[0].data;
+		
+		try {
+			ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(filename+"1"));
+			out.writeObject(saving_objects);
+			out.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+		
 	
 	float sigmoid(float x) {
 		return (float) (1 / (1+Math.exp(-x)));

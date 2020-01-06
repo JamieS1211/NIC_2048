@@ -30,6 +30,7 @@ public class NeuralNetwork {
 		
 	}
 	
+
 	void setLearningRate(float lr) {
 		this.learning_rate = lr;
 	}

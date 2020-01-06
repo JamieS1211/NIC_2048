@@ -30,6 +30,10 @@ public class Matrix {
 		}
 	}
 	
+	float[][] get_data(){
+		return this.data;
+	}
+	
 	static Matrix fromArray(float[] input_array) {
 		Matrix m = new Matrix(input_array.length,1);
 		for(int i=0;i<input_array.length;i++) {

@@ -40,16 +40,21 @@ public class TrainingData {
 			for (int i=0;i<NUM;i++) {
 				result = new Game(ACTION_TIME_LIMIT).playSingle(AGENT, random);
 				
-				if (result.getScore() > 2000) {
+				if (i%125==0) {
+					System.out.println("25% complete");
+				}
+				
+				if (result.getScore() > 4000) {
 					
-					//System.out.println(result.getScore());
+					System.out.println(result.getScore());
 					int[] actions = result.get_actions();
 					int [][][] board_states = result.get_states();
 				
 					for (int b=0;b<board_states.length;b++) {
 						float[] oh_action = Utils.one_hot_action(actions[b]);
 						int[] flattened_board = Utils.flatten_board(board_states[b]);
-						float[] normed_board = Utils.normalize_data(flattened_board);
+						//float[] normed_board = Utils.normalize_data(flattened_board);
+						float[] normed_board = Utils.int2float(flattened_board); 
 					
 						if (game_data == null) {
 							game_data = new float[1][normed_board.length];
@@ -83,7 +88,7 @@ public class TrainingData {
 			
 			
 			try {
-				AccessingGameData.save_game_data(game_data, action_data, "src//main//java//nic//test.txt");
+				AccessingGameData.save_game_data(game_data, action_data, "src//main//java//nic//training_data.txt");
 			} catch (FileNotFoundException | UnsupportedEncodingException e) {
 				e.printStackTrace();
 			}

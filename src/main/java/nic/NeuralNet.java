@@ -60,6 +60,8 @@ public class NeuralNet {
 		float[] input = {0,1};
 		float[] guess = nn.feedforward(input);
 		System.out.println(Arrays.toString(guess));
+		
+		nn.save_network("weights");
 
 		
 		
