@@ -21,9 +21,9 @@ import put.game2048.MultipleGamesResult;
 public class GeneticTrainer {
 	public static final int EVO_RANDOM_SEED = 27;
 	
-	public static final int POPULATION_SIZE = 300;
+	public static final int POPULATION_SIZE = 500;
 	public static final int NUM_MUTATIONS = 256;
-	public static final int NUM_GENERATIONS = 500;
+	public static final int NUM_GENERATIONS = 2000;
 	public static final int GAMES_PLAYED = 50;
 
 	public static final Duration ACTION_TIME_LIMIT = Duration.ofNanos(1000 * 1000);
@@ -97,8 +97,10 @@ public class GeneticTrainer {
 			
 			Date date = new Date();
 
-			System.out.println(String.format("%s Generation %3d, Max Score: %.2f, Average Score %.2f Average Time: %.4fms",
-					formatter.format(date), generation, summaryScore.getMax(), summaryScore.getMean(), summaryTime.getMean()));
+			if((generation+1) % 50 == 0) {
+				System.out.println(String.format("%s Generation %3d, Max Score: %.2f, Average Score %.2f Average Time: %.4fms",
+						formatter.format(date), generation+1, summaryScore.getMax(), summaryScore.getMean(), summaryTime.getMean()));
+			}
 			
 		    printWriter.println(String.format("%d\t%f\t%f\t%f\t",
 		    		generation, summaryScore.getMax(), summaryScore.getMean(), summaryTime.getMean()));
