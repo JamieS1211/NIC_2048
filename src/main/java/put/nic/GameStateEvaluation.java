@@ -17,7 +17,7 @@ public class GameStateEvaluation {
         double currentCellValue, rightCellValue, belowCellValue;
         double verticalDifference, horizontalDifference;
         int highestPossibleScore = 0;
-        int gameStateScore = 0;
+        int gameStateScore = 0; // This should be minimized for a good score
 
         for (int row = 0; row < 4; row++) {
             for (int column = 0; column < 4; column++) {
@@ -33,7 +33,8 @@ public class GameStateEvaluation {
                     verticalDifference = abs(currentCellValue - belowCellValue);
 
                     if (belowCellValue == 0) {
-                        gameStateScore += verticalDifference * 2; // Encourage AI to murge tiles
+                        // Decrease gameStateScore increase to encourage 0s (aka encourage a merge)
+                        gameStateScore += verticalDifference / 2;
                     } else {
                         gameStateScore += verticalDifference;
                     }
@@ -42,13 +43,13 @@ public class GameStateEvaluation {
                 // Check right connection if present
                 if (column + 1 < 4) {
                     rightCellValue = REWARDS[board.getValue(row, column + 1)];
-                    horizontalDifference = abs(currentCellValue - rightCellValue);
+                    horizontalDifference = abs(currentCellValue - rightCellValue) * 2; // double to encourage lining up left to right
 
-                    // double to encourage lining up left to right
                     if (rightCellValue == 0) {
-                        gameStateScore += horizontalDifference * 2 * 2;
+                        // Decrease gameStateScore increase to encourage 0s (aka encourage a merge)
+                        gameStateScore += horizontalDifference / 2;
                     } else {
-                        gameStateScore += horizontalDifference * 2;
+                        gameStateScore += horizontalDifference;
                     }
                 }
             }
@@ -57,6 +58,7 @@ public class GameStateEvaluation {
         if (highestPossibleScore == 0) {
             return 1;
         } else {
+            //printBoard(board);
             return highestPossibleScore - gameStateScore;
         }
     }

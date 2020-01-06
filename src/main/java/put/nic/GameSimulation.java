@@ -17,6 +17,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import static nic.Utils.printBoard;
+
 public class GameSimulation {
 
 	private final Duration actionTimeLimitSoft;
@@ -44,7 +46,12 @@ public class GameSimulation {
 
 				State2048 state = sampleInitialStateDistribution(random);
 				List<Action2048> actions = getPossibleActions(state);
-				while (!actions.isEmpty() && (maxMoves == -1 || moves < maxMoves)) {
+				while (!actions.isEmpty() && (maxMoves < 0 || moves < maxMoves)) {
+
+					if (maxMoves == -2) {
+						printBoard(state.getBoard());
+					}
+
 					moves++;
 
 					//Put state evaluation here

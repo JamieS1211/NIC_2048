@@ -95,7 +95,11 @@ public class NeatEvaluation {
 			double tally = 0;
 			final Supplier<Agent> AGENT = () -> new CustomAgent(brains[bestBrain[0]][bestBrain[1]]);
 			for (int game = 0; game < gamesPerBrain; game++) {
-				GameResult result = new GameSimulation(ACTION_TIME_LIMIT).playSingle(AGENT, random, -1);
+				int maxGames = -1;
+				if (generation % 50 == 0 && game == 0) {
+					maxGames = -2;
+				}
+				GameResult result = new GameSimulation(ACTION_TIME_LIMIT).playSingle(AGENT, random, maxGames);
 				tally += result.getScore();
 			}
 			bestBrainRealScore[generation] = tally / gamesPerBrain;
