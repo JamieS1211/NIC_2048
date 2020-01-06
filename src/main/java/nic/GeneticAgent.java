@@ -40,7 +40,7 @@ public class GeneticAgent implements Agent {
 		this.tuples = new ArrayList<Tuple>();
 		FileInputStream fileInputStream;
 		try {
-			fileInputStream = new FileInputStream("tupes.bin");
+			fileInputStream = new FileInputStream("tuples.bin");
 			ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
 			this.tuples = (ArrayList<Tuple>) objectInputStream.readObject();
 			objectInputStream.close(); 
