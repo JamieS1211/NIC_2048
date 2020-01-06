@@ -22,8 +22,8 @@ public class GeneticTrainer {
 	public static final int EVO_RANDOM_SEED = 27;
 	
 	public static final int POPULATION_SIZE = 300;
-	public static final int NUM_MUTATIONS = 2048; // :)
-	public static final int NUM_GENERATIONS = 5000;
+	public static final int NUM_MUTATIONS = 256;
+	public static final int NUM_GENERATIONS = 500;
 	public static final int GAMES_PLAYED = 50;
 
 	public static final Duration ACTION_TIME_LIMIT = Duration.ofNanos(1000 * 1000);
@@ -139,6 +139,7 @@ public class GeneticTrainer {
 				for(int k = 0; k < NUM_MUTATIONS; k++) {
 					GeneticAgent.mutate(nextGen[i], randomEvo);
 				}
+				nextGen[i].resetUsedMap();
 			}
 			population = nextGen;
 		}

@@ -25,9 +25,9 @@ public class GeneticAgent implements Agent, Serializable {
 	public static final int NSTATES = 13;
 	public static final int N = NSTATES * NSTATES * NSTATES * NSTATES;
 	
-	public float[] horizontal;
-	public float[] vertical;
-	public float[] squares;
+	public float[] scoreMap; // 0..N-1: horizontal, N..2*N-1: vertical, 2*N..3*N-1: squares
+	public int[] keysUsed;
+	public int totalKeysUsed = 0;
 	
 	public GeneticAgent() {
 		FileInputStream fileInputStream;
@@ -35,77 +35,76 @@ public class GeneticAgent implements Agent, Serializable {
 			fileInputStream = new FileInputStream("ruleset.bin");
 			ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
 			GeneticAgent readAgent = (GeneticAgent) objectInputStream.readObject();
-			this.horizontal = readAgent.horizontal;
-			this.vertical   = readAgent.vertical;
-			this.squares    = readAgent.squares;
+			this.scoreMap = readAgent.scoreMap;
 			objectInputStream.close(); 
 		} catch (IOException | ClassNotFoundException e) {
-			this.horizontal = new float[N];
-			this.vertical   = new float[N];
-			this.squares    = new float[N];
+			this.scoreMap = new float[3 * N];
 			e.printStackTrace();
 		}
+		resetUsedMap();
 	}
 
-	public GeneticAgent(float[] horizontal, float[] vertical, float[] squares) {
-		this.horizontal = horizontal;
-		this.vertical   = vertical;
-		this.squares    = squares;
+	public GeneticAgent(float[] scoreMap) {
+		this.scoreMap = scoreMap;
+		resetUsedMap();
+	}
+
+	public GeneticAgent(float[] scoreMap, int[] keysUsed, int totalKeysUsed) {
+		this.scoreMap = scoreMap;
+		this.keysUsed = keysUsed;
+		this.totalKeysUsed = totalKeysUsed;
+	}
+
+	public void resetUsedMap() {
+		this.keysUsed = new int[3 * N];
+		for(int j = 0; j < 3 * N; j++) {
+			keysUsed[j] = 0;
+		}
 	}
 
 	private static float randomValue(RandomDataGenerator rand) {
-		return rand.nextBinomial(14, 0.5) - 7;
+		return (float) rand.nextGaussian(0, 1);
 	}
 	
 	public static GeneticAgent makeRandom(RandomDataGenerator rand) {
-		float[] horizontal = new float[N];
-		float[] vertical   = new float[N];
-		float[] squares    = new float[N];
-		for(int j = 0; j < N; j++) {
-			horizontal[j] = randomValue(rand);
-			vertical[j]   = randomValue(rand);
-			squares[j]    = randomValue(rand);
+		float[] scoreMap = new float[3 * N];
+		for(int j = 0; j < 3 * N; j++) {
+			scoreMap[j] = randomValue(rand);
 		}
-		return new GeneticAgent(horizontal, vertical, squares);
+		return new GeneticAgent(scoreMap);
 	}
 
 	public static void mutate(GeneticAgent individual, RandomDataGenerator rand) {
-		{
-			int mutationPoint = rand.nextInt(0, N-1);
-			individual.horizontal[mutationPoint] += randomValue(rand);
-		}
-		{
-			int mutationPoint = rand.nextInt(0, N-1);
-			individual.vertical[mutationPoint] += randomValue(rand);
-		}
-		{
-			int mutationPoint = rand.nextInt(0, N-1);
-			individual.squares[mutationPoint] += randomValue(rand);
+		// Select mutation point based on frequency of use
+		int mutationRand = rand.nextInt(0, individual.totalKeysUsed-1);
+		for(int j = 0; j < 3 * N; j++) {
+			mutationRand -= individual.keysUsed[j];
+			if(mutationRand < 0) {
+				individual.scoreMap[j] += randomValue(rand);
+				break;
+			}
 		}
 	}
 	
-	
 	public static GeneticAgent crossover(GeneticAgent mom, GeneticAgent dad, RandomDataGenerator rand) {
-		float[] child_horizontal = new float[N];
-		float[] child_vertical   = new float[N];
-		float[] child_squares    = new float[N];
-		// Use binomial distribution to have most of the crossover points close to the middle
-		// int crossoverPoint = rand.nextBinomial(N-1, 0.5);
-		int crossoverPointHorizontal = rand.nextInt(0, N-1);
-		System.arraycopy(mom.horizontal, 0, child_horizontal, 0, crossoverPointHorizontal);
-		System.arraycopy(dad.horizontal, crossoverPointHorizontal,
-				child_horizontal, crossoverPointHorizontal, N-crossoverPointHorizontal);
+		float[] childScoreMap = new float[3*N];
+		int[] childKeysUsed = new int[3*N];
+		int childTotalKeys = 0;
+		int crossoverPoint = rand.nextInt(0, 3*N-1);
+		for(int j = 0; j < 3 * N; j++) {
+			if(j < crossoverPoint) {
+				childScoreMap[j] = mom.scoreMap[j];
+				childKeysUsed[j] = mom.keysUsed[j];
+				childTotalKeys  += mom.keysUsed[j];
+			} else {
+				childScoreMap[j] = dad.scoreMap[j];
+				childKeysUsed[j] = dad.keysUsed[j];
+				childTotalKeys  += dad.keysUsed[j];
+			}
+		}
+		GeneticAgent child = new GeneticAgent(childScoreMap, childKeysUsed, childTotalKeys);
+		return child;
 
-		int crossoverPointVertical = rand.nextInt(0, N-1);
-		System.arraycopy(mom.vertical, 0, child_vertical, 0, crossoverPointVertical);
-		System.arraycopy(dad.vertical, crossoverPointVertical,
-				child_vertical, crossoverPointVertical, N-crossoverPointVertical);
-		
-		int crossoverPointSquares = rand.nextInt(0, N-1);
-		System.arraycopy(mom.squares, 0, child_squares, 0, crossoverPointSquares);
-		System.arraycopy(dad.squares, crossoverPointSquares,
-				child_squares, crossoverPointSquares, N-crossoverPointSquares);
-		return new GeneticAgent(child_horizontal, child_vertical, child_squares);
 	}
 	
 	public float evaluate(int[][] board) {
@@ -120,7 +119,12 @@ public class GeneticAgent implements Agent, Serializable {
 				key_h = NSTATES * key_h + board[i][j];
 				key_v = NSTATES * key_v + board[j][i];
 			}
-			score += horizontal[key_h] + vertical[key_v];
+			key_v += N;
+
+			score += scoreMap[key_h] + scoreMap[key_v];
+			keysUsed[key_h]++;
+			keysUsed[key_v]++;
+			totalKeysUsed += 2;
 		}
 		
 		// squares
@@ -131,7 +135,9 @@ public class GeneticAgent implements Agent, Serializable {
 				key = NSTATES * key + board[i][j+1];
 				key = NSTATES * key + board[i+1][j];
 				key = NSTATES * key + board[i+1][j+1];
-				score += squares[key];
+				key += 2 * N;
+				score += scoreMap[key];
+				keysUsed[key]++;
 			}
 		}
 		
