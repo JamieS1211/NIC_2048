@@ -21,10 +21,10 @@ import put.game2048.MultipleGamesResult;
 public class GeneticTrainer {
 	public static final int EVO_RANDOM_SEED = 27;
 	
-	public static final int POPULATION_SIZE = 500;
+	public static final int POPULATION_SIZE = 300;
 	public static final int NUM_MUTATIONS = 256;
-	public static final int NUM_GENERATIONS = 2000;
-	public static final int GAMES_PLAYED = 50;
+	public static final int NUM_GENERATIONS = 5000;
+	public static final int GAMES_PLAYED = 30;
 
 	public static final Duration ACTION_TIME_LIMIT = Duration.ofNanos(1000 * 1000);
 	
@@ -67,9 +67,9 @@ public class GeneticTrainer {
 
 				MultipleGamesResult result = game.playMultiple(Utils.constantSupplier(currentPopulation[i]), GAMES_PLAYED, randomGame);
 				
-				double consistentScore = result.getScore().getMean() - result.getScore().getStandardDeviation();
+				double consistentScore = result.getScore().getMean();
 				
-				double currentFitness = Math.pow(consistentScore / 2000, 6);
+				double currentFitness = Math.pow(consistentScore / 2000, 8);
 				
 				fitness[i] = currentFitness;
 				summary.addValue(currentFitness);
