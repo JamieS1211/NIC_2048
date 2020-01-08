@@ -1,18 +1,14 @@
 package nic;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Supplier;
 
 import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.commons.math3.random.RandomDataGenerator;
@@ -22,14 +18,11 @@ import com.google.common.base.Preconditions;
 import put.ci.cevo.games.game2048.Action2048;
 import put.ci.cevo.games.game2048.Game2048;
 import put.ci.cevo.games.game2048.State2048;
-import put.ci.cevo.rl.environment.Transition;
 import put.ci.cevo.util.Pair;
-import put.ci.cevo.util.RandomUtils;
 import put.game2048.Action;
 import put.game2048.Agent;
 import put.game2048.Board;
-import put.game2048.Game;
-import put.game2048.MultipleGamesResult;
+
 
 public class GeneticAgent implements Agent {
 	public RandomDataGenerator random = new RandomDataGenerator(new MersenneTwister(123));
@@ -49,25 +42,24 @@ public class GeneticAgent implements Agent {
 			//makeTestTuples();// - This is the 2 6-tuples and 2 4-tuples setup
 			makeTestTuples2(); // - This is the 4 horisontal, 4 vertical and 9 squares setup
 		}
-		int q=0;
-		for (Tuple t:tuples) {
-			q+=1;
-			if (q<6) {
-			//System.out.println(t.getHashTable());
-				// THIS IS FOR DEBUG. THE CORRECT VERSION HAS NEGATIVE VALUES BUT I DON'T GET ANY NEGATIVES FOR SOME REASON. IF YOU GET LOTS OF PRINTS DELETE THIS.
-				Iterator<Double> i = t.getHashTable().values().iterator();
-				//The tuples should be negative sometimes. It does not happen in my implementation.
-				while (i.hasNext()) {
-					double d = i.next();
-					if (d<0) {
-						System.out.println(d);
-					}
-				}
-			}
-		}
 		
 }
-
+	public GeneticAgent(RandomDataGenerator random) {
+		this.tuples = new ArrayList<Tuple>();
+		FileInputStream fileInputStream;
+		try {
+			fileInputStream = new FileInputStream("tuples.bin");
+			ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+			this.tuples = (ArrayList<Tuple>) objectInputStream.readObject();
+			objectInputStream.close(); 
+		} catch (IOException | ClassNotFoundException e) {
+			//CHOOSE WHICH OF THE TUPLE SETUPS YOU WANT.
+			//makeTestTuples();// - This is the 2 6-tuples and 2 4-tuples setup
+			makeTestTuples2(); // - This is the 4 horisontal, 4 vertical and 9 squares setup
+		}
+		this.random = random;
+		
+}
 	//This method would help to initialize the population of random tuples
 	// THIS IS NOT USED YET. Mostly useful for mutated tuples approach
 	public  void makeRandomTuples(int tuple_length,RandomDataGenerator random) {
@@ -77,7 +69,7 @@ public class GeneticAgent implements Agent {
 			//TODO SHARED TABLES ARE NOT YET IMPLEMENTED
 			//i is the current tuple up to randomly decided number of them
 			ArrayList<Pair<Integer,Integer>> tuple_cells = new ArrayList<Pair<Integer,Integer>> ();
-			Map<String, Double> lookup_table = new HashMap<String, Double>();
+			//Map<String, Double> lookup_table = new HashMap<String, Double>();
 			for (int j =0; j<tuple_length;j++) {
 				
 				//each i'th tuple is iterated over its length(j)
@@ -100,18 +92,22 @@ public class GeneticAgent implements Agent {
 				}while (already_added);
 				
 			}
-			tuples.add(new Tuple(lookup_table,tuple_cells));
+			//tuples.add(new Tuple(lookup_table,tuple_cells));
 		}
 		
 		
 	}
+	/**
+	 * the set of vertical, horisontal and square tuples of length 4
+	 */
 	public void makeTestTuples2() {
-		
-		// the set of vertical, horisontal and square tuples
 		System.out.println("Making test tuples");
 		ArrayList<Tuple> tuples= new ArrayList<Tuple>();
+		double[] lookup_table1 = new double[(int) Math.pow(15, 4)];
+
 		for (int i =0 ;i<4;i++) {
-			Map<String, Double> lookup_table1 = new HashMap<String, Double>();
+			//Map<String, Double> lookup_table1 = new HashMap<String, Double>();
+
 			ArrayList<Pair<Integer,Integer>> t1_cells = new ArrayList<Pair<Integer,Integer>> ();
 			t1_cells.add(new Pair<Integer,Integer>(0,i));	
 			t1_cells.add(new Pair<Integer,Integer>(1,i));
@@ -121,20 +117,25 @@ public class GeneticAgent implements Agent {
 			Tuple t1 =new Tuple(lookup_table1,t1_cells);
 			tuples.add(t1);
 		}
+		double[] lookup_table2 = new double[(int) Math.pow(15, 4)];
+
 		for (int i =0 ;i<4;i++) {
-			Map<String, Double> lookup_table1 = new HashMap<String, Double>();
+			//Map<String, Double> lookup_table2 = new HashMap<String, Double>();
+
 			ArrayList<Pair<Integer,Integer>> t1_cells = new ArrayList<Pair<Integer,Integer>> ();
 			t1_cells.add(new Pair<Integer,Integer>(i,0));	
 			t1_cells.add(new Pair<Integer,Integer>(i,1));
 			t1_cells.add(new Pair<Integer,Integer>(i,2));
 			t1_cells.add(new Pair<Integer,Integer>(i,3));
 	
-			Tuple t1 =new Tuple(lookup_table1,t1_cells);
+			Tuple t1 =new Tuple(lookup_table2,t1_cells);
 			tuples.add(t1);
 		}
+		double[] lookup_table3 =  new double[(int) Math.pow(15, 4)];
+
 		for (int i =0 ;i<3;i++) {
 			for(int j=0;j<3;j++) {
-				Map<String, Double> lookup_table1 = new HashMap<String, Double>();
+				//Map<String, Double> lookup_table3 = new HashMap<String, Double>();
 				ArrayList<Pair<Integer,Integer>> t1_cells = new ArrayList<Pair<Integer,Integer>> ();
 				t1_cells.add(new Pair<Integer,Integer>(i,j));	
 				t1_cells.add(new Pair<Integer,Integer>(i+1,j));
@@ -142,22 +143,24 @@ public class GeneticAgent implements Agent {
 				t1_cells.add(new Pair<Integer,Integer>(i,j+1));
 
 		
-				Tuple t1 =new Tuple(lookup_table1,t1_cells);
+				Tuple t1 =new Tuple(lookup_table3,t1_cells);
 				tuples.add(t1);
 			}
 		}
 		this.tuples=tuples;
 	}
+	/**
+	 * Set of 2 rectangular tuples of length 6 and 2 tuples of length 4 
+	 */
 	public void makeTestTuples() {
-		
-		// the four tuples as given in the article 
+
 		System.out.println("Making test tuples");
 		ArrayList<Tuple> tuples= new ArrayList<Tuple>();
-		Map<String, Double> lookup_table1 = new HashMap<String, Double>();
-		Map<String, Double> lookup_table2 = new HashMap<String, Double>();
-		Map<String, Double> lookup_table3 = new HashMap<String, Double>();
+		double[] lookup_table1 = new double[(int) Math.pow(15, 6)];
+		double[] lookup_table2 = new double[(int) Math.pow(15, 6)];
+		double[] lookup_table3 = new double[(int) Math.pow(15, 4)];
 
-		Map<String, Double> lookup_table4 = new HashMap<String, Double>();
+		double[] lookup_table4 = new double[(int) Math.pow(15, 4)];
 
 		ArrayList<Pair<Integer,Integer>> t1_cells = new ArrayList<Pair<Integer,Integer>> ();
 		t1_cells.add(new Pair<Integer,Integer>(0,0));	
@@ -214,51 +217,37 @@ public class GeneticAgent implements Agent {
 		State2048 afterState = new State2048(current_state);
 
 		int reward = afterState.makeMove(current_action);
+
 		//Need to obtain sum of all tuple weights from the table
-		int[][] board_state = afterState.getBoard();
 		//pdate=true updates the previous afterstate estimate with the current one
 		for (Tuple t :tuples) {
-			tuple_weights+=t.evaluateBoard(board_state,update);
+			tuple_weights+=t.evaluateBoard(afterState.getBoard(),update);
 		}
 		//System.out.println((double)reward);
 		return new Pair<Double,Double>((double)reward ,tuple_weights);
 	}
 	/**
-	 * Learns from playing game, can also use exploration. I keep learning rate inside the function for now but will move it to a parameter later.
-	 * @param current_state - state of the game
-	 * @param explorationRate - chance of picking a random action
+	 * Evaluate the afterstate value for current tuples
+	 * @param current_state
+	 * @param update (whether to update the last key stored in tuple)
 	 * @return
 	 */
-	public Action2048 learnEvaluation( Board current_state,double explorationRate) {
-		
-		double learning_rate = 0.01;
-		//Make board into state
-		State2048 state = new State2048(current_state.get());
-		ArrayList<Action2048> possible_actions = state.getPossibleMoves();
-		Action2048 a_next =possible_actions.get(0);
-		Pair<Double,Double> best_reward_and_estimate = new Pair<Double, Double>(Double.NEGATIVE_INFINITY,Double.NEGATIVE_INFINITY);
-		
-		//System.out.println("Choosing best action from state");
-		//state.printHumanReadable();
-		//find the best of all available actions. Exploration may be used as well to try unlikely actions
-		if (random.nextUniform(0, 1) < explorationRate) {
-			a_next = possible_actions.get((int)random.nextUniform(0, possible_actions.size()));
-			best_reward_and_estimate = this.evaluate(state, a_next,false);
-		}
-		
-		else {
-			//find the best action and calculate its value
-			a_next = argmax(current_state);
-			best_reward_and_estimate = this.evaluate(state, a_next,false);
-		}
-		//System.out.println("The best action is "+a_next.toString());
-		//Evaluate runs once again for the best selected action to store tuple calculations.
-		this.evaluate(state, a_next,true);
-		for (Tuple t:tuples) {
-			t.update(best_reward_and_estimate.first(), learning_rate);
-		}
+	public double evaluateAfterstate(State2048 current_state,boolean update){
+		// The argument current_state is the state s''. This function calculates the afterstate s'_next from s''.
+		// Tuples store previous afterstate value (referred as s')
+		double tupleWeights=0;
+		//current_state.printHumanReadable();
+		//First calculate afterstate
+		State2048 afterState = new State2048(current_state);
 
-		return a_next;
+
+		//Need to obtain sum of all tuple weights from the table
+		//pdate=true updates the previous afterstate estimate with the current one
+		for (Tuple t :tuples) {
+			tupleWeights+=t.evaluateBoard(afterState.getBoard(),update);
+		}
+		//System.out.println((double)reward);
+		return tupleWeights;
 	}
 	/**
 	 * Choose the best action from the current board state (based on values from lookup table)
@@ -289,29 +278,47 @@ public class GeneticAgent implements Agent {
 	}
 	public Action chooseAction(Board board, List<Action> possibleActions, Duration maxTime) {
 		Preconditions.checkArgument(0 < possibleActions.size());
-
-		return ACTIONS[learnEvaluation(board,0).id()];
-
-
+		return ACTIONS[argmax(board).id()];
 		}
 	
 	public static void main(String[] args) {
+		double learning_rate = 0.0025; // to have a better 'immediate' result use 0.01 but seems like in long term 0.0025 is better
 		int action_time_limit_ms = 1000;
-		int num_games = 5000;
-		String random_seed = "37551565";
-		GeneticAgent g = new GeneticAgent();
-		double explorationRate = 0.001;
+		int num_games = 1000;
+		int random_seed = 55;
+		RandomDataGenerator random = new RandomDataGenerator(new MersenneTwister(random_seed));
+		GeneticAgent g = new GeneticAgent(random);
+		
+		long startTime = System.nanoTime();
+
+		
 		for (int i =0 ; i<num_games;i++) {
 			Game2048 game= new Game2048();
 			State2048 state = game.sampleInitialStateDistribution(g.random);
-		while (!game.isTerminalState(state)) {
-			Transition<State2048, Action2048> transition = game.computeTransition(state, g.learnEvaluation(new Board(state.getBoard()), explorationRate));
-			state = game.getNextState(transition.getAfterState(), g.random);
+			//double score = 0;
+		while (!game.isTerminalState(state)) {   
+			Action2048 bestAction =g.argmax(new Board(state.getBoard()));
+			int reward = state.makeMove(bestAction);
 
+			//score+=reward;
+			Pair<Double,Double> currentActionValue = g.evaluate(state, bestAction, true);
+			state.addRandomTile(g.random);
+			if (!state.isTerminal()) {
+
+				Pair<Double,Double> nextActionValue = g.evaluate(state, g.argmax(new Board(state.getBoard())), false);
+				double error = nextActionValue.second()+nextActionValue.first() -currentActionValue.second();
+				for (Tuple t:g.tuples) {
+					t.update(error*learning_rate);
+				}
+
+			}
+			
 		}
-
+		//System.out.println(score);
 	}
+		System.out.println("took "+String.valueOf((System.nanoTime()-startTime)/1_000_000_000)+" seconds for "+String.valueOf(num_games)+" games");
 		try {
+			
 			FileOutputStream fileOutputStream;
 			fileOutputStream = new FileOutputStream("tuples.bin");
 			ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
