@@ -3,6 +3,7 @@ package nic;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.util.Arrays;
 
 //import src.Matrix;
 
@@ -18,7 +19,7 @@ public class MultLayeredNN {
 	
 	
 	
-	MultLayeredNN(float[] layers, float lr){
+	public MultLayeredNN(float[] layers, float lr){
 		//layers will define the shape of the NN
 		this.input_nodes = layers[0];
 		this.output_nodes = layers[layers.length-1];
@@ -72,7 +73,7 @@ public class MultLayeredNN {
 	
 	
 	
-	float[] feedforward(float[] input_array) {
+	public float[] feedforward(float[] input_array) {
 		Matrix inputs = Matrix.fromArray(input_array);
 		Matrix current_gen = null;
 		
@@ -105,7 +106,7 @@ public class MultLayeredNN {
 	}
 	
 	
-void train(float[] input_array, float[] target_array) {
+public void train(float[] input_array, float[] target_array) {
 	
 		//System.out.println("training....");
 
@@ -175,7 +176,7 @@ void train(float[] input_array, float[] target_array) {
 				//calculate Deltas
 				hidden_T = Matrix.transpose(hiddens[m-1]);
 				c_weight_deltas = Matrix.multiply(gradients,hidden_T);
-								
+				
 				
 				this.weights[m] = Matrix.add(this.weights[m],c_weight_deltas);
 				this.biases[m] = Matrix.add(this.biases[m],gradients);
@@ -229,6 +230,30 @@ void train(float[] input_array, float[] target_array) {
 				this.biases[m] = Matrix.add(this.biases[m],gradients);
 			}
 		}
+	}
+
+	public void batch_train(float[][] input_array, float[][] target_array, float batch_size_perc, int epochs) {
+		float item;
+		String anim = "|/-\\";
+		for (int i=0;i<1/batch_size_perc;i++) {
+		//System.out.println(Arrays.deepToString(x_train[j]))
+			//System.out.println(i);
+			int batch_begin = (int)(i*(batch_size_perc)*(input_array.length-1));
+			int batch_end = (int)(i*(batch_size_perc)*(input_array.length-1) + (batch_size_perc)*(input_array.length-1));
+			float[][] batch =  Arrays.copyOfRange(input_array,batch_begin,batch_end);
+			
+			//item = Utils.randomInt(0,train_states.length);
+			for (int j=0;j<epochs;j++) {
+				//player.train(train_states[i], train_actions[i]);
+				item = Utils.randomInt(0,batch_end-batch_begin);
+				this.train(input_array[(int)item], target_array[(int)item]);
+			}
+			
+			//System.out.println(i);
+			
+		}
+		
+		
 	}
 
 

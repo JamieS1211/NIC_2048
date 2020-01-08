@@ -1,6 +1,7 @@
 package nic;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.time.Duration;
 import java.util.Arrays;
@@ -36,19 +37,44 @@ public class TrainingData {
 			float[][] game_data = null;
 			float[][] action_data = null;
 			
+			float[] nnShape = new float[]{16,32,8,32,4};
+			float lr = (float)0.001;
+			MultLayeredNN player = new MultLayeredNN(nnShape, lr);
+			
+			
+			try {
+				Data data = AccessingGameData.get_game_data("src//main//java//nic//training27_data.txt");
+				float[][] train_states = data.states;			
+				float[][] train_actions = data.actions;
+				
+				player.batch_train(train_states, train_actions, (float)0.2, 100000);
+		
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			
+			
+			
 			//
 			for (int i=0;i<NUM;i++) {
-				result = new Game(ACTION_TIME_LIMIT).playSingle(AGENT, random);
+				Game game = new Game(ACTION_TIME_LIMIT);
+				game.player = player;
+				result = game.playSingle(AGENT, random);
+				
 				
 				if (i%125==0) {
 					System.out.println("25% complete");
 				}
 				
-				if (result.getScore() > 4000) {
+				if (result.getScore() > 5000) {
 					
-					System.out.println(result.getScore());
+					//System.out.println(result.getScore());
 					int[] actions = result.get_actions();
+					//System.out.println(Arrays.toString(actions));
 					int [][][] board_states = result.get_states();
+					
 				
 					for (int b=0;b<board_states.length;b++) {
 						float[] oh_action = Utils.one_hot_action(actions[b]);
@@ -79,16 +105,13 @@ public class TrainingData {
 							game_data = n_game_data;
 							action_data = n_action_data;
 						}
-
-
 					}	
-				}
-							
+				}			
 			}
 			
 			
 			try {
-				AccessingGameData.save_game_data(game_data, action_data, "src//main//java//nic//training_data.txt");
+				AccessingGameData.save_game_data(game_data, action_data, "src//main//java//nic//training27_data.txt");
 			} catch (FileNotFoundException | UnsupportedEncodingException e) {
 				e.printStackTrace();
 			}

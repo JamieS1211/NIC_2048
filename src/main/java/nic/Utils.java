@@ -85,7 +85,7 @@ public class Utils {
 		  return numbers[numbers.length-1];
 	}
 	
-	static float randomInt(float a,float b) {
+	public static float randomInt(float a,float b) {
 		float rand = (float)(a + Math.random() * (b - a));
 		return rand;
 		

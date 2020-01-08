@@ -1,6 +1,8 @@
 package put.game2048;
 
+import java.io.IOException;
 import java.time.Duration;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -15,7 +17,9 @@ import put.ci.cevo.games.game2048.Game2048;
 import put.ci.cevo.games.game2048.Player2048;
 import put.ci.cevo.games.game2048.State2048;
 import put.ci.cevo.util.Pair;
-
+import nic.AccessingGameData;
+import nic.Data;
+import nic.MultLayeredNN;
 import nic.Utils;
 
 public class Game {
@@ -25,10 +29,12 @@ public class Game {
 	///Phoenix 04/01/2020
 	private int[][][] states=null;
 	private int[] actions=null;
+	
+	public MultLayeredNN player;
 	///////
 
 	public Game(Duration actionTimeLimit) {
-		this.actionTimeLimitSoft = actionTimeLimit;
+		this.actionTimeLimitSoft = actionTimeLimit;		
 	}
 	
 	public void update_actions(int act) {
@@ -55,6 +61,11 @@ public class Game {
 		return this.states;
 		
 	}
+	
+	public int[] get_actions() {
+		return this.actions;
+	}
+	
 	///Phoenix 04/01/2020
 	public void update_states(State2048 state) {
 		int[][] c_state = state.getBoard();		
@@ -79,7 +90,7 @@ public class Game {
 	public GameResult playSingle(Supplier<Agent> agentSupplier, RandomDataGenerator random) {
 		Preconditions.checkNotNull(agentSupplier);
 		Preconditions.checkNotNull(random);
-
+	
 		Agent agent = agentSupplier.get();
 
 		GameResult.Builder gameResult = new GameResult.Builder();
@@ -94,7 +105,7 @@ public class Game {
 				List<Action> possibleActions = actions.stream().map(Game::toAction).collect(Collectors.toList());
 				Stopwatch stopwatch = new Stopwatch();
 				stopwatch.start();
-				Action action = agent.chooseAction(new Board(state.getBoard()), possibleActions, actionTimeLimitSoft);
+				Action action = agent.chooseAction(player, new Board(state.getBoard()), possibleActions, actionTimeLimitSoft);
 				update_actions(action.getId());
 				if (action == null || !possibleActions.contains(action))
 					throw new IllegalStateException("The agent made an illegal action");
