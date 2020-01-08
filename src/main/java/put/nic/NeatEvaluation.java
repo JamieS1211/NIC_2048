@@ -18,8 +18,8 @@ public class NeatEvaluation {
 		//Setup constants
 		final int generations = 250;
 		final int generationSize = 250;
-		final int gamesPerBrain = 10;
-		final int[] brainLayerSizes = {16, 32, 32, 4}; // Rule of thump, input size * output size / 2
+		final int gamesPerBrain = 25;
+		final int[] brainLayerSizes = {16, 32, 4}; // Rule of thumb, input size * output size / 2
 
 		//Running values of best brain
 		int[] bestBrain = new int[2];
@@ -41,8 +41,8 @@ public class NeatEvaluation {
 
 		//Simulate
 		for (int generation = 0; generation < generations; generation++) {
-			int maxMoves = 50 + (generation * 3);
-			int totalFitness = 0;
+			int maxMoves = 100;
+			double totalFitness = 0;
 
 			//Simulate game
 			for (int brainIndex = 0; brainIndex < generationSize; brainIndex++) {
@@ -51,13 +51,13 @@ public class NeatEvaluation {
 				final Supplier<Agent> AGENT = () -> new CustomAgent(currentBrain);
 
 				//Average and save the score
-				double tally = 0;
+				int tally = 0;
 				for (int game = 0; game < gamesPerBrain; game++) {
 					GameResult result = new GameSimulation(ACTION_TIME_LIMIT).playSingle(AGENT, random, maxMoves);
 					tally += result.getScore();
 				}
 
-				averageScores[generation][brainIndex] = tally / gamesPerBrain;
+				averageScores[generation][brainIndex] = Math.pow(tally / gamesPerBrain, 2);
 				totalFitness += averageScores[generation][brainIndex];
 
 				if (averageScores[generation][brainIndex] > bestBrainFitness) {
@@ -92,19 +92,14 @@ public class NeatEvaluation {
 			}
 
 			//Run current best brain for some games
-			double tally = 0;
+			int tally = 0;
 			final Supplier<Agent> AGENT = () -> new CustomAgent(brains[bestBrain[0]][bestBrain[1]]);
 			for (int game = 0; game < gamesPerBrain; game++) {
-				int maxGames = -1;
-				if (generation % 50 == 0 && game == 0) {
-					maxGames = -2;
-				}
-				GameResult result = new GameSimulation(ACTION_TIME_LIMIT).playSingle(AGENT, random, maxGames);
+				GameResult result = new GameSimulation(ACTION_TIME_LIMIT).playSingle(AGENT, random, -1);
 				tally += result.getScore();
 			}
 			bestBrainRealScore[generation] = tally / gamesPerBrain;
 		}
-
 
 		System.out.println("Done");
 	}

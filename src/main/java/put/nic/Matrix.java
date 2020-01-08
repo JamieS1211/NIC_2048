@@ -7,8 +7,7 @@ public class Matrix {
 	
 	float max = 1;
 	float min = -1;
-	
-	
+
 	Matrix(float[][] matrix_){
 		this.rows = matrix_.length;
 		this.cols = matrix_[0].length;
@@ -33,8 +32,8 @@ public class Matrix {
 		for(int i=0;i<input_array.length;i++) {
 			m.data[i][0]=input_array[i];
 		}
+
 		return m;
-		
 	}
 	
 	float[] toArray(){
@@ -46,8 +45,8 @@ public class Matrix {
 				index +=1;
 			}
 		}
+
 		return output;
-			
 	}
 	
 	void print() {
@@ -57,7 +56,6 @@ public class Matrix {
 			}
 			System.out.println();
 		}
-		
 	}
 	
 	void multiply(float n){
@@ -70,7 +68,6 @@ public class Matrix {
 	}
 	
 	void multiply(Matrix n){
-
 		for (int i=0; i<this.rows;i++) {
 			for(int j=0; j<this.cols;j++) {
 				this.data[i][j] *= n.data[i][j];
@@ -94,26 +91,25 @@ public class Matrix {
 					
 			return result;		
 		}
-				
-		}
-			
+	}
 
 	
 	static Matrix add(Matrix m, Matrix n){
 		Matrix result = new Matrix(m.rows,m.cols);
-		for (int i=0; i<m.rows;i++) {
-			for(int j=0; j<m.cols;j++) {
-				result.data[i][j] = m.data[i][j]+n.data[i][j];
+		for (int i = 0; i < m.rows; i++) {
+			for(int j = 0; j < m.cols; j++) {
+				result.data[i][j] = m.data[i][j] + n.data[i][j];
 			}
 		}
+
 		return result;
 	}
 	
 	
 	void add(float n){
-		for (int i=0; i<this.rows;i++) {
-			for(int j=0; j<this.cols;j++) {
-				this.data[i][j] = this.data[i][j]+n;
+		for (int i = 0; i < this.rows; i++) {
+			for(int j = 0; j < this.cols; j++) {
+				this.data[i][j] = this.data[i][j] + n;
 			}
 		}
 	}
@@ -121,11 +117,12 @@ public class Matrix {
 	static Matrix subtract(float n, Matrix m) {
 		//Return n-m
 		Matrix result = new Matrix(m.rows,m.cols);
-		for (int i=0; i<result.rows;i++) {
-			for(int j=0; j<result.cols;j++) {
+		for (int i = 0; i < result.rows; i++) {
+			for(int j = 0; j < result.cols; j++) {
 				result.data[i][j] = n - m.data[i][j];
 			}
 		}
+
 		return result;	
 	}
 		
@@ -133,31 +130,31 @@ public class Matrix {
 	static Matrix subtract(Matrix m, Matrix n) {
 		// Return a new Matrix a-b
 		Matrix result = new Matrix(m.rows,m.cols);
-		for (int i=0; i<result.rows;i++) {
-			for(int j=0; j<result.cols;j++) {
-				result.data[i][j] = m.data[i][j]-n.data[i][j];
+		for (int i = 0; i < result.rows; i++) {
+			for(int j = 0; j < result.cols; j++) {
+				result.data[i][j] = m.data[i][j] - n.data[i][j];
 			}
 		}
+
 		return result;	
 	}
 	
 	void randomize() {
-		for (int i=0; i<this.rows;i++) {
-			for(int j=0; j<this.cols;j++) {
-				this.data[i][j] = (float)(Math.random() * ((this.max - this.min)+1))+this.min ;
-		
+		for (int i = 0; i < this.rows; i++) {
+			for(int j = 0; j < this.cols; j++) {
+				this.data[i][j] = (float)(Math.random() * ((this.max - this.min)+1)) + this.min ;
 			}
 		}	
 	}
 	
 	static Matrix transpose(Matrix t) {
 		Matrix result = new Matrix(t.cols,t.rows);
-		for (int i=0; i<t.rows;i++) {
-			for(int j=0; j<t.cols;j++) {
-			result.data[j][i] = t.data[i][j];
-			
+		for (int i = 0; i < t.rows; i++) {
+			for(int j = 0; j < t.cols; j++) {
+				result.data[j][i] = t.data[i][j];
 			}	
 		}
+
 		return result;
 	}
 }

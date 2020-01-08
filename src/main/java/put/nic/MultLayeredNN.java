@@ -33,14 +33,14 @@ public class MultLayeredNN {
 			hidden_nodes[i - 1] = layers[i];
 		}
 		
-		this.weights = new Matrix[layers.length-1];
-		this.biases = new Matrix[layers.length-1];
+		this.weights = new Matrix[layers.length - 1];
+		this.biases = new Matrix[layers.length - 1];
 
 		for (int i = 0; i < this.weights.length; i++) {
-			this.weights[i] = new Matrix(layers[i+1],layers[i]);
+			this.weights[i] = new Matrix(layers[i + 1],layers[i]);
 			this.weights[i].randomize();
 			
-			this.biases[i] = new Matrix(layers[i+1],1);
+			this.biases[i] = new Matrix(layers[i + 1],1);
 			this.biases[i].randomize();
 		}
 		
@@ -48,7 +48,7 @@ public class MultLayeredNN {
 	}
 	
 	float sigmoid(float x) {
-		return (float) (1 / (1+Math.exp(-x)));
+		return (float) (1 / (1 + Math.exp(-x)));
 	}
 	
 	void setLearningRate(float lr) {
