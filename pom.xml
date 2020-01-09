@@ -22,7 +22,7 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>put.game2048.AgentEvaluation</mainClass>
+							<mainClass>nic.AgentEvaluation</mainClass>
 						</manifest>
 					</archive>
 					<descriptorRefs>

@@ -23,6 +23,14 @@ jobs:
         sudo apt install gnuplot
         cd $GITHUB_WORKSPACE
         gnuplot plot.gnu
+    - name: Build AgentEvaluation
+      run: |
+        cd $GITHUB_WORKSPACE
+        mvn package
+    - name: Run AgentEvaluation
+      run: |
+        cd $GITHUB_WORKSPACE
+        java -jar target/2048-1.0-jar-with-dependencies.jar
     - uses: actions/upload-artifact@v1
       with:
         name: Run Summary
