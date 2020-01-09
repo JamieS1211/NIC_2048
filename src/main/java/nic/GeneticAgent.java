@@ -291,7 +291,7 @@ public class GeneticAgent implements Agent {
 	public static void main(String[] args) throws IOException {
 		double learning_rate = 0.0025; // to have a better 'immediate' result use 0.01 but seems like in long term 0.0025 is better
 		int action_time_limit_ms = 1000;
-		int num_games = 1000;
+		int num_games = 50000;
 		int random_seed = 55;
 		RandomDataGenerator random = new RandomDataGenerator(new MersenneTwister(random_seed));
 		GeneticAgent g = new GeneticAgent(random);
