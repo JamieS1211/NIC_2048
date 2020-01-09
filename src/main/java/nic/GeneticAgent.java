@@ -320,7 +320,7 @@ public class GeneticAgent implements Agent {
 
 	public static void main(String[] args) throws IOException {
 		int action_time_limit_ms = 1000;
-		int num_games = 5000;
+		int num_games = 500000;
 		String random_seed = "37551565";
 		GeneticAgent g = new GeneticAgent();
 		double explorationRate = 0.001;
