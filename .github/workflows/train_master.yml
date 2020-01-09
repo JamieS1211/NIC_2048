@@ -1,0 +1,33 @@
+name: Train and Test
+
+on:
+  push:
+    branches:
+      - "master"
+
+jobs:
+  build-and-run:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Build Trainer
+      run: |
+        cd $GITHUB_WORKSPACE
+        mvn -f pom_trainer.xml package
+    - name: Run the Training
+      run: |
+        cd $GITHUB_WORKSPACE
+        java -Xms2G -Xmx6G  -jar target/Trainer-1.0-jar-with-dependencies.jar
+    - name: Plot the Run
+      run: |
+        sudo apt install gnuplot
+        cd $GITHUB_WORKSPACE
+        gnuplot plot.gnu
+    - uses: actions/upload-artifact@v1
+      with:
+        name: Run Summary
+        path: plot.png
+    - uses: actions/upload-artifact@v1
+      with:
+        name: Best Individual
+        path: ruleset.bin
