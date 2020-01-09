@@ -29,5 +29,5 @@ jobs:
         path: plot.png
     - uses: actions/upload-artifact@v1
       with:
-        name: Best Individual
-        path: ruleset.bin
+        name: Best Tuples
+        path: tuples.bin
