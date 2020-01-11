@@ -50,7 +50,7 @@ public class TupleGenotype {
      * @param parent2
      */
     TupleGenotype(TupleGenotype parent1, TupleGenotype parent2) {
-    	this.directions.add(UP);
+    	this.directions.add(UP);//UP
         this.directions.add(LEFT);
         this.directions.add(DOWN);
         this.directions.add(RIGHT);
