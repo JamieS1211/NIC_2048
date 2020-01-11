@@ -11,6 +11,9 @@ public class TupleGenotype {
     public int startDirection;
     public int[] turns = new int[3];
 
+    private int chrom_amount = 3;
+    private int[] board_size = {4, 4};
+
     // Increasing index by 1 is a turn to left
     public Pair<Integer, Integer> UP = new Pair<>(0, 1);
     public Pair<Integer, Integer> LEFT = new Pair<>(-1, 0);
@@ -40,16 +43,6 @@ public class TupleGenotype {
         this.turns[1] = rand.nextInt(turnDirections.length);
         this.turns[2] = rand.nextInt(turnDirections.length);
     }
-
-    /**
-     * Create a new tuple genotype from two parents
-     * @param parent1
-     * @param parent2
-     */
-    TupleGenotype(TupleGenotype parent1, TupleGenotype parent2) {
-
-    }
-    
     
       /**
      * Create a new tuple genotype from two parents
@@ -57,7 +50,6 @@ public class TupleGenotype {
      * @param parent2
      */
     TupleGenotype(TupleGenotype parent1, TupleGenotype parent2) {
-    	
     	this.directions.add(UP);
         this.directions.add(LEFT);
         this.directions.add(DOWN);
@@ -80,6 +72,7 @@ public class TupleGenotype {
     		this.turns[i] = parents[choose].turns[i];
     	}
     }
+
     void mutate() {
     	Random rand = new Random();
     	
@@ -110,8 +103,6 @@ public class TupleGenotype {
     		
     		return;
     	}
-    	
-    	
     }
     	
     void print() {
