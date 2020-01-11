@@ -11,7 +11,6 @@ import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.math3.random.MersenneTwister;
@@ -28,19 +27,24 @@ import put.game2048.Agent;
 import put.game2048.Board;
 
 
-public class GeneticAgent implements Agent,Runnable {
+public class GeneticAgent implements Agent, Runnable {
+
 	public RandomDataGenerator random = new RandomDataGenerator(new MersenneTwister(123));
 	public static Action[] ACTIONS = { Action.UP, Action.RIGHT, Action.DOWN, Action.LEFT };
 	private ArrayList<Tuple> tuples;
-	public static final int[] stateMax = {16384,8192,4096,2048,1024};
-	public static final int[] stateIterations = {25,20,15,10,5};
-	//public static final int[] stateIterations = {45,35,25,15,5};
+	public static final int[] stateMax = {16384, 8192, 4096, 2048, 1024};
+	public static final int[] stateIterations = {25, 20, 15, 10, 5};
+	//public static final int[] stateIterations = {45, 35, 25, 15, 5};
 
-	private static final SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss");	
+	private static final SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss");
 
+	/**
+	 *
+	 */
 	public GeneticAgent() {
 		this.tuples = new ArrayList<Tuple>();
 		FileInputStream fileInputStream;
+
 		try {
 			fileInputStream = new FileInputStream("tuples.bin");
 			ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
@@ -48,88 +52,18 @@ public class GeneticAgent implements Agent,Runnable {
 			objectInputStream.close(); 
 		} catch (IOException | ClassNotFoundException e) {
 			//CHOOSE WHICH OF THE TUPLE SETUPS YOU WANT.
-			makeTestTuples();// - This is the 2 6-tuples and 	2 4-tuples setup
+			makeTestTuples(); // - This is the 2 6-tuples and 	2 4-tuples setup
 			//makeTestTuples2(); // - This is the 4 horisontal, 4 vertical and 9 squares setup
 		}
-
 	}
+
+	/**
+	 *
+	 * @param random
+	 */
 	public GeneticAgent(RandomDataGenerator random) {
-		this.tuples = new ArrayList<Tuple>();
-		FileInputStream fileInputStream;
-		try {
-			fileInputStream = new FileInputStream("tuples.bin");
-			ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
-			this.tuples = (ArrayList<Tuple>) objectInputStream.readObject();
-			objectInputStream.close(); 
-		} catch (IOException | ClassNotFoundException e) {
-			//CHOOSE WHICH OF THE TUPLE SETUPS YOU WANT.
-			makeTestTuples3();// - This is the 2 6-tuples and 2 4-tuples setup
-			//makeTestTuples(); // - This is the 4 horisontal, 4 vertical and 9 squares setup
-		}
+		this();
 		this.random = random;
-
-	}
-	//This method would help to initialize the population of random tuples
-	public Tuple makeRandomTuple(int tuple_length,RandomDataGenerator random) {
-		ArrayList<Pair<Integer,Integer>> tupleCells = new ArrayList<Pair<Integer,Integer>> ();
-		double[] lookup_table = new double[(int)Math.pow(15,tuple_length)];
-		ArrayList<Pair<Integer,Integer>> availableValues = new ArrayList<Pair<Integer,Integer>>();
-		for (int i=0;i<4;i++) {
-			for (int j =0;j<4;j++) {
-				availableValues.add(new Pair<Integer,Integer>(i,j));
-			}
-		}
-		int firstCell = random.nextInt(0, availableValues.size());
-		tupleCells.add(availableValues.get(firstCell));
-		availableValues.remove(firstCell);
-		for (int j =0; j<tuple_length-1;j++) {
-			//each i'th tuple is iterated over its length(j)
-			//x,y are a random coordinate on the board
-			int x =random.nextInt(0,availableValues.size());
-			tupleCells.add(availableValues.get(x));
-		}
-		return new Tuple(lookup_table,tupleCells);	
-	}
-	public Tuple makeRandomHVTuple(int tuple_length,RandomDataGenerator random) {
-		ArrayList<Pair<Integer,Integer>> tupleCells = new ArrayList<Pair<Integer,Integer>> ();
-		double[] lookup_table = new double[(int)Math.pow(15,tuple_length)];
-		ArrayList<Pair<Integer,Integer>> availableValues = new ArrayList<Pair<Integer,Integer>>();
-		for (int i=0;i<4;i++) {
-			for (int j =0;j<4;j++) {
-				availableValues.add(new Pair<Integer,Integer>(i,j));
-			}
-		}
-		int firstCell = random.nextInt(0, availableValues.size());
-		tupleCells.add(availableValues.get(firstCell));
-		availableValues.remove(firstCell);
-		for (int j =0; j<tuple_length-1;j++) {
-
-			//each i'th tuple is iterated over its length(j)
-			//x,y are a random coordinate on the board
-			int x ;
-			boolean adjecent = false;
-
-			do {
-				x=random.nextInt(0,availableValues.size());			
-				Pair<Integer,Integer> candidateValue= availableValues.get(x);
-				for (Pair<Integer,Integer> cell :tupleCells) {
-					if(cell.first()==candidateValue.first()) {
-						if(cell.second()==(candidateValue.second()+1)||cell.second()==(candidateValue.second()-1)) {
-							adjecent=true;
-							break;
-						}
-					}
-					if(cell.second()==candidateValue.second()) {
-						if(cell.first()==(candidateValue.first()+1)||cell.first()==(candidateValue.first()-1)) {
-							adjecent=true;
-							break;
-						}
-					}
-				}
-			}while(!adjecent);
-			
-		}
-		return new Tuple(lookup_table,tupleCells);	
 	}
 
 	/**
@@ -137,105 +71,113 @@ public class GeneticAgent implements Agent,Runnable {
 	 */
 	public void makeTestTuples2() {
 		System.out.println("Making test tuples");
-		ArrayList<Tuple> tuples= new ArrayList<Tuple>();
+		ArrayList<Tuple> tuples = new ArrayList<Tuple>();
 		double[] lookup_table1 = new double[(int) Math.pow(15, 4)];
 
-		for (int i =0 ;i<4;i++) {
+		for (int i = 0; i < 4; i++) {
 			//Map<String, Double> lookup_table1 = new HashMap<String, Double>();
 
-			ArrayList<Pair<Integer,Integer>> t1_cells = new ArrayList<Pair<Integer,Integer>> ();
-			t1_cells.add(new Pair<Integer,Integer>(0,i));	
-			t1_cells.add(new Pair<Integer,Integer>(1,i));
-			t1_cells.add(new Pair<Integer,Integer>(2,i));
-			t1_cells.add(new Pair<Integer,Integer>(3,i));
+			ArrayList<Pair<Integer, Integer>> t1_cells = new ArrayList<>();
+			t1_cells.add(new Pair<>(0, i));
+			t1_cells.add(new Pair<>(1, i));
+			t1_cells.add(new Pair<>(2, i));
+			t1_cells.add(new Pair<>(3, i));
 
-			Tuple t1 =new Tuple(lookup_table1,t1_cells);
+			Tuple t1 = new Tuple(lookup_table1, t1_cells);
 			tuples.add(t1);
 		}
+
 		double[] lookup_table2 = new double[(int) Math.pow(15, 4)];
 
-		for (int i =0 ;i<4;i++) {
+		for (int i = 0; i < 4; i++) {
 			//Map<String, Double> lookup_table2 = new HashMap<String, Double>();
 
-			ArrayList<Pair<Integer,Integer>> t1_cells = new ArrayList<Pair<Integer,Integer>> ();
-			t1_cells.add(new Pair<Integer,Integer>(i,0));	
-			t1_cells.add(new Pair<Integer,Integer>(i,1));
-			t1_cells.add(new Pair<Integer,Integer>(i,2));
-			t1_cells.add(new Pair<Integer,Integer>(i,3));
+			ArrayList<Pair<Integer, Integer>> t1_cells = new ArrayList<>();
+			t1_cells.add(new Pair<>(i, 0));
+			t1_cells.add(new Pair<>(i, 1));
+			t1_cells.add(new Pair<>(i, 2));
+			t1_cells.add(new Pair<>(i, 3));
 
-			Tuple t1 =new Tuple(lookup_table2,t1_cells);
+			Tuple t1 = new Tuple(lookup_table2, t1_cells);
 			tuples.add(t1);
 		}
+
 		double[] lookup_table3 =  new double[(int) Math.pow(15, 4)];
 
-		for (int i =0 ;i<3;i++) {
-			for(int j=0;j<3;j++) {
+		for (int i = 0; i < 3; i++) {
+			for(int j = 0; j < 3; j++) {
 				//Map<String, Double> lookup_table3 = new HashMap<String, Double>();
-				ArrayList<Pair<Integer,Integer>> t1_cells = new ArrayList<Pair<Integer,Integer>> ();
-				t1_cells.add(new Pair<Integer,Integer>(i,j));	
-				t1_cells.add(new Pair<Integer,Integer>(i+1,j));
-				t1_cells.add(new Pair<Integer,Integer>(i+1,j+1));
-				t1_cells.add(new Pair<Integer,Integer>(i,j+1));
+				ArrayList<Pair<Integer, Integer>> t1_cells = new ArrayList<>();
+				t1_cells.add(new Pair<>(i, j));
+				t1_cells.add(new Pair<>(i + 1, j));
+				t1_cells.add(new Pair<>(i + 1, j + 1));
+				t1_cells.add(new Pair<>(i, j + 1));
 
 
-				Tuple t1 =new Tuple(lookup_table3,t1_cells);
+				Tuple t1 = new Tuple(lookup_table3, t1_cells);
 				tuples.add(t1);
 			}
 		}
-		this.tuples=tuples;
+
+		this.tuples = tuples;
 	}
+
 	/**
 	 * Set of 2 rectangular tuples of length 6 and 2 tuples of length 4 
 	 */
 	public void makeTestTuples() {
 
 		System.out.println("Making test tuples");
-		ArrayList<Tuple> tuples= new ArrayList<Tuple>();
+		ArrayList<Tuple> tuples = new ArrayList<Tuple>();
 		double[] lookup_table1 = new double[(int) Math.pow(15, 6)];
 		double[] lookup_table2 = new double[(int) Math.pow(15, 6)];
 		double[] lookup_table3 = new double[(int) Math.pow(15, 4)];
-
 		double[] lookup_table4 = new double[(int) Math.pow(15, 4)];
 
-		ArrayList<Pair<Integer,Integer>> t1_cells = new ArrayList<Pair<Integer,Integer>> ();
-		t1_cells.add(new Pair<Integer,Integer>(0,0));	
-		t1_cells.add(new Pair<Integer,Integer>(0,1));
-		t1_cells.add(new Pair<Integer,Integer>(1,1));
-		t1_cells.add(new Pair<Integer,Integer>(2,1));
-		t1_cells.add(new Pair<Integer,Integer>(2,0));
-		t1_cells.add(new Pair<Integer,Integer>(1,0));
-		Tuple t1 =new Tuple(lookup_table1,t1_cells);
-		ArrayList<Pair<Integer,Integer>> t2_cells = new ArrayList<Pair<Integer,Integer>> ();
-		t2_cells.add(new Pair<Integer,Integer>(0,1));
-		t2_cells.add(new Pair<Integer,Integer>(0,2));
-		t2_cells.add(new Pair<Integer,Integer>(1,2));
-		t2_cells.add(new Pair<Integer,Integer>(2,2));
-		t2_cells.add(new Pair<Integer,Integer>(2,1));
-		t2_cells.add(new Pair<Integer,Integer>(1,1));
-		Tuple t2 =new Tuple(lookup_table2,t2_cells);
+		ArrayList<Pair<Integer, Integer>> t1_cells = new ArrayList<>();
+		t1_cells.add(new Pair<>(0, 0));
+		t1_cells.add(new Pair<>(0, 1));
+		t1_cells.add(new Pair<>(1, 1));
+		t1_cells.add(new Pair<>(2, 1));
+		t1_cells.add(new Pair<>(2, 0));
+		t1_cells.add(new Pair<>(1, 0));
+		Tuple t1 = new Tuple(lookup_table1, t1_cells);
 
-		ArrayList<Pair<Integer,Integer>> t3_cells = new ArrayList<Pair<Integer,Integer>> ();
-		t3_cells.add(new Pair<Integer,Integer>(0,2));
-		t3_cells.add(new Pair<Integer,Integer>(1,2));
-		t3_cells.add(new Pair<Integer,Integer>(2,2));
-		t3_cells.add(new Pair<Integer,Integer>(3,2));
+		ArrayList<Pair<Integer, Integer>> t2_cells = new ArrayList<>();
+		t2_cells.add(new Pair<>(0, 1));
+		t2_cells.add(new Pair<>(0, 2));
+		t2_cells.add(new Pair<>(1, 2));
+		t2_cells.add(new Pair<>(2, 2));
+		t2_cells.add(new Pair<>(2, 1));
+		t2_cells.add(new Pair<>(1, 1));
+		Tuple t2 = new Tuple(lookup_table2, t2_cells);
 
-		Tuple t3 =new Tuple(lookup_table3,t3_cells);
+		ArrayList<Pair<Integer, Integer>> t3_cells = new ArrayList<>();
+		t3_cells.add(new Pair<>(0, 2));
+		t3_cells.add(new Pair<>(1, 2));
+		t3_cells.add(new Pair<>(2, 2));
+		t3_cells.add(new Pair<>(3, 2));
+		Tuple t3 = new Tuple(lookup_table3, t3_cells);
 
-		ArrayList<Pair<Integer,Integer>> t4_cells = new ArrayList<Pair<Integer,Integer>> ();
-		t4_cells.add(new Pair<Integer,Integer>(0,3));
-		t4_cells.add(new Pair<Integer,Integer>(1,3));
-		t4_cells.add(new Pair<Integer,Integer>(2,3));
-		t4_cells.add(new Pair<Integer,Integer>(3,3));
-		Tuple t4 =new Tuple(lookup_table4,t4_cells);
+		ArrayList<Pair<Integer, Integer>> t4_cells = new ArrayList<>();
+		t4_cells.add(new Pair<>(0, 3));
+		t4_cells.add(new Pair<>(1, 3));
+		t4_cells.add(new Pair<>(2, 3));
+		t4_cells.add(new Pair<>(3, 3));
+		Tuple t4 = new Tuple(lookup_table4, t4_cells);
+
 		tuples.add(t1);
 		tuples.add(t2);
 		tuples.add(t3);
 		tuples.add(t4);
+
 		this.tuples = tuples;
 	}
-	public void makeTestTuples3() {
 
+	/**
+	 *
+	 */
+	public void makeTestTuples3() {
 		System.out.println("Making test tuples");
 		ArrayList<Tuple> tuples= new ArrayList<Tuple>();
 		double[] lookup_table1 = new double[(int) Math.pow(15, 6)];
@@ -244,47 +186,50 @@ public class GeneticAgent implements Agent,Runnable {
 
 		double[] lookup_table4 = new double[(int) Math.pow(15, 6)];
 
-		ArrayList<Pair<Integer,Integer>> t1_cells = new ArrayList<Pair<Integer,Integer>> ();
-		t1_cells.add(new Pair<Integer,Integer>(0,0));	
-		t1_cells.add(new Pair<Integer,Integer>(1,0));
-		t1_cells.add(new Pair<Integer,Integer>(1,1));
-		t1_cells.add(new Pair<Integer,Integer>(0,1));
-		t1_cells.add(new Pair<Integer,Integer>(0,2));
-		t1_cells.add(new Pair<Integer,Integer>(0,3));
-		Tuple t1 =new Tuple(lookup_table1,t1_cells);
-		ArrayList<Pair<Integer,Integer>> t2_cells = new ArrayList<Pair<Integer,Integer>> ();
-		t2_cells.add(new Pair<Integer,Integer>(1,0));
-		t2_cells.add(new Pair<Integer,Integer>(2,0));
-		t2_cells.add(new Pair<Integer,Integer>(2,1));
-		t2_cells.add(new Pair<Integer,Integer>(1,1));
-		t2_cells.add(new Pair<Integer,Integer>(1,2));
-		t2_cells.add(new Pair<Integer,Integer>(1,3));
-		Tuple t2 =new Tuple(lookup_table2,t2_cells);
+		ArrayList<Pair<Integer, Integer>> t1_cells = new ArrayList<>();
+		t1_cells.add(new Pair<>(0, 0));
+		t1_cells.add(new Pair<>(1, 0));
+		t1_cells.add(new Pair<>(1, 1));
+		t1_cells.add(new Pair<>(0, 1));
+		t1_cells.add(new Pair<>(0, 2));
+		t1_cells.add(new Pair<>(0, 3));
+		Tuple t1 = new Tuple(lookup_table1, t1_cells);
 
-		ArrayList<Pair<Integer,Integer>> t3_cells = new ArrayList<Pair<Integer,Integer>> ();
-		t3_cells.add(new Pair<Integer,Integer>(0,0));
-		t3_cells.add(new Pair<Integer,Integer>(0,1));
-		t3_cells.add(new Pair<Integer,Integer>(0,2));
-		t3_cells.add(new Pair<Integer,Integer>(1,2));
-		t3_cells.add(new Pair<Integer,Integer>(1,1));
-		t3_cells.add(new Pair<Integer,Integer>(1,0));
+		ArrayList<Pair<Integer, Integer>> t2_cells = new ArrayList<>();
+		t2_cells.add(new Pair<>(1, 0));
+		t2_cells.add(new Pair<>(2, 0));
+		t2_cells.add(new Pair<>(2, 1));
+		t2_cells.add(new Pair<>(1, 1));
+		t2_cells.add(new Pair<>(1, 2));
+		t2_cells.add(new Pair<>(1, 3));
+		Tuple t2 = new Tuple(lookup_table2, t2_cells);
 
-		Tuple t3 =new Tuple(lookup_table3,t3_cells);
+		ArrayList<Pair<Integer, Integer>> t3_cells = new ArrayList<>();
+		t3_cells.add(new Pair<>(0, 0));
+		t3_cells.add(new Pair<>(0, 1));
+		t3_cells.add(new Pair<>(0, 2));
+		t3_cells.add(new Pair<>(1, 2));
+		t3_cells.add(new Pair<>(1, 1));
+		t3_cells.add(new Pair<>(1, 0));
+		Tuple t3 = new Tuple(lookup_table3, t3_cells);
 
-		ArrayList<Pair<Integer,Integer>> t4_cells = new ArrayList<Pair<Integer,Integer>> ();
-		t4_cells.add(new Pair<Integer,Integer>(1,0));
-		t4_cells.add(new Pair<Integer,Integer>(1,1));
-		t4_cells.add(new Pair<Integer,Integer>(1,2));
-		t4_cells.add(new Pair<Integer,Integer>(2,2));
-		t4_cells.add(new Pair<Integer,Integer>(2,1));
-		t4_cells.add(new Pair<Integer,Integer>(2,0));
-		Tuple t4 =new Tuple(lookup_table4,t4_cells);
+		ArrayList<Pair<Integer, Integer>> t4_cells = new ArrayList<>();
+		t4_cells.add(new Pair<>(1, 0));
+		t4_cells.add(new Pair<>(1, 1));
+		t4_cells.add(new Pair<>(1, 2));
+		t4_cells.add(new Pair<>(2, 2));
+		t4_cells.add(new Pair<>(2, 1));
+		t4_cells.add(new Pair<>(2, 0));
+		Tuple t4 = new Tuple(lookup_table4, t4_cells);
+
 		tuples.add(t1);
 		tuples.add(t2);
 		tuples.add(t3);
 		tuples.add(t4);
+
 		this.tuples = tuples;
 	}
+
 	/**
 	 * 
 	 * Evaluate the given state-action pair 
@@ -294,10 +239,10 @@ public class GeneticAgent implements Agent,Runnable {
 	 * without the future update use false instead.
 	 * @return
 	 */
-	public Pair<Double, Double> evaluate(State2048 current_state,Action2048 current_action,boolean update){
+	public Pair<Double, Double> evaluate(State2048 current_state, Action2048 current_action, boolean update){
 		// The argument current_state is the state s''. This function calculates the afterstate s'_next from s''.
 		// Tuples store previous afterstate value (referred as s')
-		double tupleWeights=0;
+		double tupleWeights = 0;
 		//current_state.printHumanReadable();
 		//First calculate afterstate
 		State2048 afterState = new State2048(current_state);
@@ -306,41 +251,41 @@ public class GeneticAgent implements Agent,Runnable {
 
 		//Need to obtain sum of all tuple weights from the table
 		//pdate=true updates the previous afterstate estimate with the current one
-		for (int i=0;i<4;i++) {
+		for (int i = 0; i < 4; i++) {
 			for (Tuple t :tuples) {
-				tupleWeights+=t.evaluateBoard(afterState.getBoard(),update);
-				tupleWeights+=t.evaluateBoardReflection(afterState.getBoard(),update);
-	
+				tupleWeights += t.evaluateBoard(afterState.getBoard(), update);
+				tupleWeights += t.evaluateBoardReflection(afterState.getBoard(), update);
 			}
 			afterState.rotateBoard();
 		}
 		//System.out.println((double)reward);
-		return new Pair<Double,Double>((double)reward ,tupleWeights);
+		return new Pair<>((double) reward, tupleWeights);
 	}
+
 	/**
 	 * Evaluate the afterstate value for current tuples
 	 * @param current_state
 	 * @param update (whether to update the last key stored in tuple)
 	 * @return
 	 */
-	public double evaluateAfterstate(State2048 current_state,boolean update){
+	public double evaluateAfterstate(State2048 current_state, boolean update){
 		// The argument current_state is the state s''. This function calculates the afterstate s'_next from s''.
 		// Tuples store previous afterstate value (referred as s')
-		double tupleWeights=0;
+		double tupleWeights = 0;
 
 		//Need to obtain sum of all tuple weights from the table
 		//pdate=true updates the previous afterstate estimate with the current one
-		for (int i=0;i<4;i++) {
+		for (int i = 0; i < 4; i++) {
 			for (Tuple t :tuples) {
-				tupleWeights+=t.evaluateBoard(current_state.getBoard(),update);
-				tupleWeights+=t.evaluateBoardReflection(current_state.getBoard(),update);
-				
+				tupleWeights += t.evaluateBoard(current_state.getBoard(), update);
+				tupleWeights += t.evaluateBoardReflection(current_state.getBoard(), update);
 			}
 			current_state.rotateBoard();
 		}
 		//System.out.println((double)reward);
 		return tupleWeights;
 	}
+
 	/**
 	 * Choose the best action from the current board state (based on values from lookup table)
 	 * @param current_state - any given board state (NOT AFTERSTATE). The function uses this.evaluate (which calculates the afterstate)
@@ -351,23 +296,34 @@ public class GeneticAgent implements Agent,Runnable {
 		//Turn board into state. From the state s calculate the action that result in the best s' based on the table values
 		State2048 state = new State2048(current_state.get());
 		ArrayList<Action2048> possible_actions = state.getPossibleMoves();
-		Action2048 a_next =possible_actions.get(0);
-		Pair<Double,Double> best_reward_and_estimate = new Pair<Double, Double>(Double.NEGATIVE_INFINITY,Double.NEGATIVE_INFINITY);
-		for (Action2048 current_action:possible_actions) {
+		Action2048 a_next = possible_actions.get(0);
+		Pair<Double, Double> best_reward_and_estimate = new Pair<>(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY);
+
+		for (Action2048 current_action : possible_actions) {
 			//Refers to r+V(s')
-			Pair<Double,Double> reward_and_estimate = this.evaluate(state, current_action,false);
-			if ((reward_and_estimate.second()+reward_and_estimate.first())>(best_reward_and_estimate.second()+best_reward_and_estimate.first())) {
-				a_next =current_action;
+			Pair<Double, Double> reward_and_estimate = this.evaluate(state, current_action,false);
+
+			if ((reward_and_estimate.second() + reward_and_estimate.first()) > (best_reward_and_estimate.second() + best_reward_and_estimate.first())) {
+				a_next = current_action;
 				best_reward_and_estimate = reward_and_estimate;
 			}
 		}
 		//a_next is the best predicted action
 		return a_next;
 	}
+
+	/**
+	 *
+	 * @param board
+	 * @param possibleActions
+	 * @param maxTime
+	 * @return
+	 */
 	public Action chooseAction(Board board, List<Action> possibleActions, Duration maxTime) {
 		Preconditions.checkArgument(0 < possibleActions.size());
 		return ACTIONS[argmax(board).id()];
 	}
+
 	/**
 	 * Plays a several games starting from the given state (and learns them)
 	 * @param state - starting state
@@ -379,62 +335,65 @@ public class GeneticAgent implements Agent,Runnable {
     		int reward = state.makeMove(argmax(new Board(state.getBoard())));
     		double currentActionValue = evaluateAfterstate(state, true);
     		state.addRandomTile(random);
+
     		if (!state.isTerminal()) {
-    			Pair<Double,Double> nextActionValue = evaluate(state, argmax(new Board(state.getBoard())), false);
-    			double error = nextActionValue.second()+nextActionValue.first() -currentActionValue;
-    			for (Tuple t:tuples) {
+    			Pair<Double, Double> nextActionValue = evaluate(state, argmax(new Board(state.getBoard())), false);
+    			double error = nextActionValue.second() + nextActionValue.first() - currentActionValue;
+    			for (Tuple t : tuples) {
     				//t.update(error*learning_rate/g.tuples.size());
-    				t.update(error*learning_rate);
+    				t.update(error * learning_rate);
     			}
     		}
     	}
 	}
-	public void mixTuples(GeneticAgent g1,GeneticAgent g2,RandomDataGenerator random) {
-		ArrayList<Tuple> allTuples = g1.tuples;
-		for (Tuple t :g2.tuples) {
-			allTuples.add(t);
-		}
-		ArrayList<Tuple> newG1Tuples = new ArrayList<Tuple>();
-		ArrayList<Tuple> newG2Tuples = new ArrayList<Tuple>();
-		
-	}
-	public void learnAgent(int numGames,double learningRate) {
+
+	/**
+	 *
+	 * @param numGames
+	 * @param learningRate
+	 */
+	public void learnAgent(int numGames, double learningRate) {
 		RandomDataGenerator random = new RandomDataGenerator(new MersenneTwister());
 		//RandomDataGenerator random = new RandomDataGenerator(new MersenneTwister(random_seed));
-	    for (int i =0 ; i<numGames;i++) {
-	    	Game2048 game= new Game2048();
+
+	    for (int i = 0; i < numGames; i++) {
+	    	Game2048 game = new Game2048();
 	    	State2048 state = game.sampleInitialStateDistribution(random);
-	    	int lastStateMax=0;
+	    	int lastStateMax = 0;
+
 	    	while (!game.isTerminalState(state)) {
 	    		//checks the maximum tile reached for this game and if it is in the list starts to learn from that state.
 	    		//this happens only once for each value in the list.
 	    		int max = state.getMaxTile();
-	    		for (int j=0;j<stateMax.length;j++) {
-	    			if(stateMax[j]==max&&stateMax[j]>lastStateMax) {
-	    				for (int numberOfRepetitions=0;numberOfRepetitions<stateIterations[j];numberOfRepetitions++) {
-	    					learnFromState(new State2048(state),learningRate);
-	    					lastStateMax=stateMax[j];
+
+	    		for (int j = 0; j < stateMax.length; j++) {
+	    			if (stateMax[j] == max && stateMax[j] > lastStateMax) {
+	    				for (int numberOfRepetitions = 0; numberOfRepetitions < stateIterations[j]; numberOfRepetitions++) {
+	    					learnFromState(new State2048(state), learningRate);
+	    					lastStateMax = stateMax[j];
 	    				}
+
 	    				break;
 	    			}
 	    		}
+
 	    		int reward = state.makeMove(argmax(new Board(state.getBoard())));
 	    		double currentActionValue = evaluateAfterstate(state, true);
 	    		state.addRandomTile(random);
 	    		
 	    		if (!state.isTerminal()) {
-	    		
-	    			Pair<Double,Double> nextActionValue = evaluate(state, argmax(new Board(state.getBoard())), false);
-	    			double error = nextActionValue.second()+nextActionValue.first() -currentActionValue;
-	    			for (Tuple t:tuples) {
+	    			Pair<Double, Double> nextActionValue = evaluate(state, argmax(new Board(state.getBoard())), false);
+	    			double error = nextActionValue.second() + nextActionValue.first() - currentActionValue;
+	    			for (Tuple t : tuples) {
 	    				//t.update(error*learning_rate/g.tuples.size());
-	    				t.update(error*learningRate);
+	    				t.update(error * learningRate);
 	    			}
 	    		}
 	    	}
 	    }
 
 	}
+
 	/**
 	 *
 	 * @param args
@@ -454,23 +413,27 @@ public class GeneticAgent implements Agent,Runnable {
 	    FileWriter fileWriter = new FileWriter("run.tsv");
 	    PrintWriter printWriter = new PrintWriter(fileWriter);
 	    
-	    for (int i =0 ; i<numGames;i++) {
-	    	Game2048 game= new Game2048();
+	    for (int i = 0; i < numGames; i++) {
+
+	    	Game2048 game = new Game2048();
 	    	State2048 state = game.sampleInitialStateDistribution(g.random);
 	    	int score = 0;
-	    	int lastStateMax=0;
+	    	int lastStateMax = 0;
+
 	    	while (!game.isTerminalState(state)) {
 	    		//checks the maximum tile reached for this game and if it is in the list starts to learn from that state.
 	    		//this happens only once for each value in the list.
 	    		int max = state.getMaxTile();
-	    		for (int j=0;j<stateMax.length;j++) {
-	    			if(stateMax[j]==max&&stateMax[j]>lastStateMax) {
+	    		for (int j = 0; j < stateMax.length; j++) {
+	    			if (stateMax[j] == max && stateMax[j] > lastStateMax) {
 	    				System.out.println("learning from state");
 	    				state.printHumanReadable();
-	    				for (int numberOfRepetitions=0;numberOfRepetitions<stateIterations[j];numberOfRepetitions++) {
-	    					g.learnFromState(new State2048(state),learning_rate);
-	    					lastStateMax=stateMax[j];
+
+	    				for (int numberOfRepetitions = 0; numberOfRepetitions<stateIterations[j]; numberOfRepetitions++) {
+	    					g.learnFromState(new State2048(state), learning_rate);
+	    					lastStateMax = stateMax[j];
 	    				}
+
 	    				break;
 	    			}
 	    		}
@@ -482,29 +445,28 @@ public class GeneticAgent implements Agent,Runnable {
 	    		state.addRandomTile(g.random);
 	    		
 	    		if (!state.isTerminal()) {
-	    		
-	    			Pair<Double,Double> nextActionValue = g.evaluate(state, g.argmax(new Board(state.getBoard())), false);
-	    			double error = nextActionValue.second()+nextActionValue.first() -currentActionValue;
-	    			for (Tuple t:g.tuples) {
+	    			Pair<Double, Double> nextActionValue = g.evaluate(state, g.argmax(new Board(state.getBoard())), false);
+	    			double error = nextActionValue.second() + nextActionValue.first() - currentActionValue;
+	    			for (Tuple t : g.tuples) {
 	    				//t.update(error*learning_rate/g.tuples.size());
-	    				t.update(error*learning_rate);
+	    				t.update(error * learning_rate);
 	    			}
 	    		}
 	    	}
 	    	
-			printWriter.println(String.format("%d\t%d", i+1, score));
+			printWriter.println(String.format("%d\t%d", i + 1, score));
 			printWriter.flush();
 
-			if((i+1) % 100 == 0 || (i+1) == numGames) {
+			if ((i + 1) % 100 == 0 || (i + 1) == numGames) {
 				Date date = new Date();
-				System.out.println(String.format("%s: %3d Games Played, Score: %4d",
-						formatter.format(date), i+1, score));
+				System.out.println(String.format("%s: %3d Games Played, Score: %4d", formatter.format(date), i + 1, score));
 			}
 	    }
-		printWriter.close();
-		System.out.println("took "+String.valueOf((System.nanoTime()-startTime)/1_000_000_000)+" seconds for "+String.valueOf(numGames)+" games");
-		try {
 
+		printWriter.close();
+		System.out.println("took " + (System.nanoTime() - startTime) / 1_000_000_000 + " seconds for " + numGames + " games");
+
+		try {
 			FileOutputStream fileOutputStream;
 			fileOutputStream = new FileOutputStream("tuples.bin");
 			ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
@@ -515,10 +477,10 @@ public class GeneticAgent implements Agent,Runnable {
 			e.printStackTrace();
 		}	
 	}
+
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
-		
 	}
 }
 
