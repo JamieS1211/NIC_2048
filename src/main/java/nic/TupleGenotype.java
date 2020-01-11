@@ -49,31 +49,31 @@ public class TupleGenotype {
     TupleGenotype(TupleGenotype parent1, TupleGenotype parent2) {
 
     }
-    
-    
+
+
       /**
      * Create a new tuple genotype from two parents
      * @param parent1
      * @param parent2
      */
     TupleGenotype(TupleGenotype parent1, TupleGenotype parent2) {
-    	
+
     	this.directions.add(UP);
         this.directions.add(LEFT);
         this.directions.add(DOWN);
         this.directions.add(RIGHT);
-    	
+
     	Random rand = new Random();
     	TupleGenotype[] parents = new TupleGenotype[] {parent1, parent2};
     	int choose = rand.nextInt(1);
-    	
-  
-    	this.startPosition = parents[choose].startPosition; 
-    	
+
+
+    	this.startPosition = parents[choose].startPosition;
+
     	choose = rand.nextInt(1);
-    	
+
     	this.startDirection = parents[choose].startDirection;
-    	
+
     	//Turns
     	for (int i=0;i<this.turns.length;i++) {
     		choose = rand.nextInt(1);
@@ -82,55 +82,71 @@ public class TupleGenotype {
     }
     void mutate() {
     	Random rand = new Random();
-    	
+
     	int mutation = rand.nextInt(this.chrom_amount);
-    	
-    	
+
+
     	switch(mutation) {
-    	
+
     	case 0:
     		//Start Position
     		int xstart = rand.nextInt(this.board_size[0]-1);
     		int ystart = rand.nextInt(this.board_size[1]-1);
     		this.startPosition = new Pair<>(xstart,ystart);
-    		
+
     		return;
-    	
+
     	case 1:
     		//Start Direction
     		int direction = rand.nextInt(this.directions.size());
     		this.startDirection = direction;
-    		
+
     		return;
-    	
+
     	case 2:
     		//turns
     		int changing_turn = rand.nextInt(this.turnDirections.length);
     		this.turns[changing_turn] = rand.nextInt(this.turnDirections.length);
-    		
+
     		return;
     	}
-    	
-    	
+
+
     }
-    	
+
     void print() {
     	System.out.println("Start Position: "+this.startPosition);
     	System.out.println("Start direction: "+this.startDirection);
-    	
+
     	for (int i=0; i<this.turns.length;i++) {
     		System.out.println("Turn"+i+" : "+this.turnDirections[i]);
     	}
     	System.out.println();
-    	
+
     }
 
-    public boolean isTupleValid(Pair<Integer, Integer> tuple) {
+    public boolean isTupleValid(ArrayList<Pair<Integer, Integer>> tupleCells) {
         // Check it doesn't go back on itself
-
-        // Check all are inside board
-
-        return true;
+    	for (Pair<Integer,Integer> cell:tupleCells) {
+    		if(cell.first()<0||cell.second()<0) {
+    			return false;
+    		}
+    	}
+    	for (int i=0 ; i<tupleCells.size();i++) {
+    		for (int j=0;j<tupleCells.size();j++) {
+    			if(i==j) {
+    				continue;
+    			}
+    			Pair<Integer,Integer> t1 = tupleCells.get(i);
+    			Pair<Integer,Integer> t2 = tupleCells.get(j);
+    			if(t1.first()==t2.first()) {
+    				if(t2.second()==t2.second()) {
+    					return false;
+    				}
+    			}
+    		}
+    	}
+    	return true;
     }
 
     public ArrayList<Pair<Integer, Integer>> buildTupleCells() {
