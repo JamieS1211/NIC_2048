@@ -49,6 +49,81 @@ public class TupleGenotype {
     TupleGenotype(TupleGenotype parent1, TupleGenotype parent2) {
 
     }
+    
+    
+      /**
+     * Create a new tuple genotype from two parents
+     * @param parent1
+     * @param parent2
+     */
+    TupleGenotype(TupleGenotype parent1, TupleGenotype parent2) {
+    	
+    	this.directions.add(UP);
+        this.directions.add(LEFT);
+        this.directions.add(DOWN);
+        this.directions.add(RIGHT);
+    	
+    	Random rand = new Random();
+    	TupleGenotype[] parents = new TupleGenotype[] {parent1, parent2};
+    	int choose = rand.nextInt(1);
+    	
+  
+    	this.startPosition = parents[choose].startPosition; 
+    	
+    	choose = rand.nextInt(1);
+    	
+    	this.startDirection = parents[choose].startDirection;
+    	
+    	//Turns
+    	for (int i=0;i<this.turns.length;i++) {
+    		choose = rand.nextInt(1);
+    		this.turns[i] = parents[choose].turns[i];
+    	}
+    }
+    void mutate() {
+    	Random rand = new Random();
+    	
+    	int mutation = rand.nextInt(this.chrom_amount);
+    	
+    	
+    	switch(mutation) {
+    	
+    	case 0:
+    		//Start Position
+    		int xstart = rand.nextInt(this.board_size[0]-1);
+    		int ystart = rand.nextInt(this.board_size[1]-1);
+    		this.startPosition = new Pair<>(xstart,ystart);
+    		
+    		return;
+    	
+    	case 1:
+    		//Start Direction
+    		int direction = rand.nextInt(this.directions.size());
+    		this.startDirection = direction;
+    		
+    		return;
+    	
+    	case 2:
+    		//turns
+    		int changing_turn = rand.nextInt(this.turnDirections.length);
+    		this.turns[changing_turn] = rand.nextInt(this.turnDirections.length);
+    		
+    		return;
+    	}
+    	
+    	
+    }
+    	
+    void print() {
+    	System.out.println("Start Position: "+this.startPosition);
+    	System.out.println("Start direction: "+this.startDirection);
+    	
+    	for (int i=0; i<this.turns.length;i++) {
+    		System.out.println("Turn"+i+" : "+this.turnDirections[i]);
+    	}
+    	System.out.println();
+    	
+    }
 
     public boolean isTupleValid(Pair<Integer, Integer> tuple) {
         // Check it doesn't go back on itself
