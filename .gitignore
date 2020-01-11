@@ -3,3 +3,5 @@
 target/
 .DS_Store
 /bin/
+run.tsv
+tuples.bin
