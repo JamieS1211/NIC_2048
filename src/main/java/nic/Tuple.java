@@ -26,6 +26,18 @@ public class Tuple implements Serializable {
 		currentValue = 0;
 	}
 
+	public int findKey(int[][] boardState) {
+		int key = boardState[tupleCells.get(0).first()][tupleCells.get(0).second()];
+		int base15 = 15;
+
+		for (int i = 1; i < tupleCells.size(); i++) {
+			key += base15 * boardState[tupleCells.get(i).first()][tupleCells.get(i).second()];
+			base15 *= 15;
+		}
+
+		return key;
+	}
+
 	/**
 	 * Each tuple keeps its current key used for last action evaluation.
      * use update = true only if you are going to update the value for that action
@@ -34,13 +46,7 @@ public class Tuple implements Serializable {
 	 * @return Value of tuple for given board
 	 */
 	public double evaluateBoard(int[][] boardState, boolean update) {
-		int key = 0;
-		int base15 = 1;
-		
-		for (Pair<Integer, Integer> cellPosition:tupleCells) {
-			key += base15 * boardState[cellPosition.first()][cellPosition.second()];
-			base15 *= 15;
-		}
+		int key = findKey(boardState);
 
 		if (update) {
 			this.tupleKey = key;
@@ -68,8 +74,8 @@ public class Tuple implements Serializable {
 	}
 
 	/**
-	 * Currently unused
-	 * Compares tuple shapes to possibly share the lookup table between tuples. Should be useful in tuple evaluation.
+	 * Currently unused. Should be useful in tuple evaluation
+	 * Compares tuple shapes (regardless of position) to possibly share the lookup table between tuples
 	 * @param another_tuple - Tuple to compare to
 	 * @return - Are tuples same shape
 	 */
