@@ -423,13 +423,19 @@ public class GeneticAgent implements Agent, Runnable {
  		int random_seed = 123;
  		RandomDataGenerator random = new RandomDataGenerator(new MersenneTwister());
  		//RandomDataGenerator random = new RandomDataGenerator(new MersenneTwister(random_seed));
-
- 		GeneticAgent g = new GeneticAgent(new ArrayList<Tuple>());
- 		g.makeTestTuples();
- 		GeneticAgent g1 = new GeneticAgent(new ArrayList<Tuple>());
- 		g1.makeTestTuples3();
- 		new Thread(g).start();
- 		new Thread(g1).start();
+ 		ArrayList<GeneticAgent> agents = new ArrayList<>();
+ 		for (int i =0 ; i<1;i++) {
+ 			ArrayList<Tuple> tuples = new ArrayList<>();
+ 			for (int j =0;j<4;j++) {
+ 	 			int randomLength = random.nextInt(2, 7);
+ 	 			double [] lut = new double[(int)Math.pow(15, randomLength)];
+ 	 			tuples.add(new Tuple(lut,new TupleGenotype(randomLength).buildTupleCells()));
+ 			}
+ 			agents.add(new GeneticAgent(tuples));
+ 		}
+ 		for (GeneticAgent g :agents) {
+ 			new Thread(g).start();
+ 		}
  		// FileWriter for score logging
 
  		//g.learnAgent(numGames,learning_rate,true);
