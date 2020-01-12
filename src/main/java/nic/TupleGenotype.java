@@ -14,9 +14,9 @@ public class TupleGenotype {
     private int[] board_size = {4, 4};
 
     // Increasing index by 1 is a turn to left
-    public Pair<Integer, Integer> UP = new Pair<>(0, 1);
+    public Pair<Integer, Integer> UP = new Pair<>(0, -1);
     public Pair<Integer, Integer> LEFT = new Pair<>(-1, 0);
-    public Pair<Integer, Integer> DOWN = new Pair<>(0, -1);
+    public Pair<Integer, Integer> DOWN = new Pair<>(0, 1);
     public Pair<Integer, Integer> RIGHT = new Pair<>(1, 0);
     public ArrayList<Pair<Integer, Integer>> directions = new ArrayList<>();
 
@@ -26,16 +26,23 @@ public class TupleGenotype {
     public int[] turnDirections = {TURN_RIGHT, TURN_STRAIGHT, TURN_LEFT};
 
     /**
-     * Create a new random tuple genotype of given size
-     * @param tupleSize - Size of the tuple
+     * Private constructor to add directions
      */
-    TupleGenotype(int tupleSize) {
-        Random rand = new Random();
-
+    private TupleGenotype() {
         this.directions.add(UP);
         this.directions.add(LEFT);
         this.directions.add(DOWN);
         this.directions.add(RIGHT);
+    }
+
+    /**
+     * Create a new random tuple genotype of given size
+     * @param tupleSize - Size of the tuple
+     */
+    TupleGenotype(int tupleSize) {
+        this();
+
+        Random rand = new Random();
 
         this.startPosition = new Pair<>(rand.nextInt(3), rand.nextInt(3));
         this.startDirection = rand.nextInt(directions.size());
@@ -53,6 +60,8 @@ public class TupleGenotype {
      * @param turns - List of turns to make
      */
     TupleGenotype(Pair<Integer, Integer> startPosition, int startDirection, int[] turns) {
+        this();
+
         this.startPosition = startPosition;
         this.startDirection = startDirection;
         this.turns = turns;
@@ -64,14 +73,11 @@ public class TupleGenotype {
      * @param parent2 - Parent 2
      */
     TupleGenotype(TupleGenotype parent1, TupleGenotype parent2) throws IllegalArgumentException {
+        this();
+
         if (parent1.turns.length != parent2.turns.length) {
             throw new IllegalArgumentException();
         }
-
-        this.directions.add(UP);
-        this.directions.add(LEFT);
-        this.directions.add(DOWN);
-        this.directions.add(RIGHT);
 
         Random rand = new Random();
         TupleGenotype[] parents = {parent1, parent2};
