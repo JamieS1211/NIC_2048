@@ -34,6 +34,20 @@ public class TupleGenotype {
         this.directions.add(DOWN);
         this.directions.add(RIGHT);
     }
+    
+    TupleGenotype randomTuple(int tupleSize){
+    	TupleGenotype g1 = new TupleGenotype(tupleSize);
+    	ArrayList<Pair<Integer, Integer>> tuples = g1.buildTupleCells();
+    	
+    	while (!isTupleValid(tuples)) {
+    		g1 = new TupleGenotype(tupleSize);
+    		tuples = g1.buildTupleCells();
+    	}
+    	
+    	return g1;
+    	
+    }
+    
 
     /**
      * Create a new random tuple genotype of given size
