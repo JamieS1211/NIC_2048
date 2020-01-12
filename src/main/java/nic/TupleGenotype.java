@@ -34,20 +34,6 @@ public class TupleGenotype {
         this.directions.add(DOWN);
         this.directions.add(RIGHT);
     }
-    
-    TupleGenotype randomTuple(int tupleSize){
-    	TupleGenotype g1 = new TupleGenotype(tupleSize);
-    	ArrayList<Pair<Integer, Integer>> tuples = g1.buildTupleCells();
-    	
-    	while (!isTupleValid(tuples)) {
-    		g1 = new TupleGenotype(tupleSize);
-    		tuples = g1.buildTupleCells();
-    	}
-    	
-    	return g1;
-    	
-    }
-    
 
     /**
      * Create a new random tuple genotype of given size
@@ -62,9 +48,15 @@ public class TupleGenotype {
         this.startDirection = rand.nextInt(directions.size());
         this.turns = new int[tupleSize - 1];
 
-        for (int i = 0; i < tupleSize; i++) {
-            this.turns[i] = rand.nextInt(turnDirections.length);
-        }
+        boolean valid = false;
+
+        do {
+            for (int i = 0; i < tupleSize - 1; i++) {
+                this.turns[i] = rand.nextInt(turnDirections.length) - 1;
+            }
+
+            valid = isTupleValid(this.buildTupleCells());
+        } while (!valid);
     }
 
     /**
@@ -178,7 +170,7 @@ public class TupleGenotype {
     public boolean isTupleValid(ArrayList<Pair<Integer, Integer>> tupleCells) {
         // Check it doesn't go back on itself
         for (Pair<Integer, Integer> cell : tupleCells) {
-            if (cell.first() < 0 || cell.second() < 0) {
+            if (cell.first() < 0 || cell.first() >= 4 || cell.second() < 0 || cell.second() >= 4) {
                 return false;
             }
         }
@@ -193,7 +185,7 @@ public class TupleGenotype {
                 Pair<Integer, Integer> t2 = tupleCells.get(j);
 
                 if (t1.first() == t2.first()) {
-                    if (t2.second() == t2.second()) {
+                    if (t1.second() == t2.second()) {
                         return false;
                     }
                 }
