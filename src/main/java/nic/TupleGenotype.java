@@ -208,7 +208,7 @@ public class TupleGenotype {
         tupleCells.add(currentPosition);
 
         for (int turn = 0; turn < this.turns.length; turn++) {
-            currentDirection = (currentDirection + this.turns[turn]) % 4;
+            currentDirection = ((currentDirection + this.turns[turn]) + 4) % 4;
             currentPosition = new Pair<>(currentPosition.first() + directions.get(currentDirection).first(), currentPosition.second() + directions.get(currentDirection).second());
             tupleCells.add(currentPosition);
         }
