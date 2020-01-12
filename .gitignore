@@ -5,3 +5,5 @@ target/
 /bin/
 run.tsv
 tuples.bin
+tuples0.bin
+*.bin

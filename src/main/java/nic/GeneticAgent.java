@@ -38,7 +38,7 @@ public class GeneticAgent implements Agent, Runnable {
 	public static final int[] stateIterations = {25, 20, 15, 10, 5};
 	//public static final int[] stateIterations = {45, 35, 25, 15, 5};
 	private static FileWriter fileWriter ;
-  private static  PrintWriter printWriter ;
+    private static  PrintWriter printWriter ;
 	private static final SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss");
 
 	/**
@@ -70,6 +70,19 @@ public class GeneticAgent implements Agent, Runnable {
 	}
 	/**
 	*/
+	public GeneticAgent(int id) {
+		FileInputStream fileInputStream;
+		try {
+			fileInputStream = new FileInputStream("tuples"+String.valueOf(id)+".bin");
+			ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+			this.tuples = (ArrayList<Tuple>) objectInputStream.readObject();
+			objectInputStream.close();
+		} catch (IOException | ClassNotFoundException e) {
+			//CHOOSE WHICH OF THE TUPLE SETUPS YOU WANT.
+			makeTestTuples(); // - This is the 2 6-tuples and 	2 4-tuples setup
+			//makeTestTuples2(); // - This is the 4 horisontal, 4 vertical and 9 squares setup
+		}
+	}
 	public GeneticAgent(ArrayList<Tuple> tuples) {
 		this.tuples=tuples;
 		this.myId=id;
@@ -442,7 +455,7 @@ public class GeneticAgent implements Agent, Runnable {
  	}
  	@Override
  	public void run() {
- 		learnAgent(10000,0.0025,true);
+ 		learnAgent(20000,0.0025,true);
  		try {
  			FileOutputStream fileOutputStream;
  			fileOutputStream = new FileOutputStream("tuples"+String.valueOf(this.myId)+".bin");

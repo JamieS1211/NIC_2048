@@ -10,12 +10,13 @@ import java.time.Duration;
 import java.util.function.Supplier;
 
 public class AgentEvaluation {
+	private static int id = 0 ;
 	public static void main(String[] args) {
 		int action_time_limit_ms = 1000;
 		int num_games = 1000;
 		String random_seed = "3753121565";
 
-		final Supplier<Agent> AGENT = createAgentFactoryByReflection();
+		 Supplier<Agent> AGENT = createAgentFactoryByReflection();
 		final int REPEATS = num_games;
 		final Duration ACTION_TIME_LIMIT = Duration.ofNanos(action_time_limit_ms * 1000 * 1000);
 		final long RANDOM_SEED = Long.parseLong(random_seed);
@@ -23,10 +24,15 @@ public class AgentEvaluation {
 		RandomDataGenerator random = new RandomDataGenerator(new MersenneTwister(RANDOM_SEED));
 		MultipleGamesResult result = new Game(ACTION_TIME_LIMIT).playMultiple(AGENT, REPEATS, random);
 		System.out.println(result.toCvsRow());
+		id+=1;
+		AGENT = createAgentFactoryByReflection();
+
+		result = new Game(ACTION_TIME_LIMIT).playMultiple(AGENT, REPEATS, random);
+		System.out.println(result.toCvsRow());
 	}
 
 	private static Supplier<Agent> createAgentFactoryByReflection() {
-		GeneticAgent agent = new GeneticAgent();
+		GeneticAgent agent = new GeneticAgent(id);
 		return () -> agent;
 	}
 }

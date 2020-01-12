@@ -11,7 +11,7 @@ public class Tuple implements Serializable {
 	private ArrayList<Pair<Integer, Integer>> tupleCells;
 	private ArrayList<Integer> tupleKeys; 
 	private double current_value;
-
+	private ArrayList<Double> scores = new ArrayList<>();
 	/**
 	 *
 	 * @param lookup
@@ -30,6 +30,16 @@ public class Tuple implements Serializable {
 	 * @param boardState
 	 * @return
 	 */
+	public void addScore(double score) {
+		scores.add(score);
+	}
+	public double evaluateScores() {
+		double sum =0;
+		for (Double score :scores) {
+			sum+=score;
+		}
+		return (sum/=scores.size());
+	}
 	public int findKey(int[][] boardState) {
 		int key = boardState[tupleCells.get(0).first()][tupleCells.get(0).second()];
 		int base15 = 15;
