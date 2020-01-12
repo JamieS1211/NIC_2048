@@ -92,7 +92,7 @@ public class TupleGenotype {
         if (parent1.turns.length != parent2.turns.length) {
             throw new IllegalArgumentException();
         }
-
+ 
         Random rand = new Random();
         TupleGenotype[] parents = {parent1, parent2};
 
@@ -108,6 +108,18 @@ public class TupleGenotype {
             choose = rand.nextInt(1);
             this.turns[i] = parents[choose].turns[i];
         }
+        
+        boolean valid = false;
+        while (!valid) {
+        	this.turns = new int[parent1.turns.length];
+            for (int i = 0; i < this.turns.length; i++) {
+                choose = rand.nextInt(1);
+                this.turns[i] = parents[choose].turns[i];
+            }
+            
+            valid = this.isTupleValid(this.buildTupleCells());
+        }
+        
     }
 
     /**
