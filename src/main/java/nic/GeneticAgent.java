@@ -39,6 +39,9 @@ public class GeneticAgent implements Agent, Runnable {
     private static  PrintWriter printWriter ;
 	private static final SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss");
 
+	public int myId;
+	public static int id = 0;
+
 	/**
 	 *
 	 */
@@ -66,12 +69,15 @@ public class GeneticAgent implements Agent, Runnable {
 		this();
 		this.random = random;
 	}
+
 	/**
-	*/
+	 *
+	 * @param id
+	 */
 	public GeneticAgent(int id) {
 		FileInputStream fileInputStream;
 		try {
-			fileInputStream = new FileInputStream("tuples"+String.valueOf(id)+".bin");
+			fileInputStream = new FileInputStream("tuples" + id + ".bin");
 			ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
 			this.tuples = (ArrayList<Tuple>) objectInputStream.readObject();
 			objectInputStream.close();
@@ -81,11 +87,17 @@ public class GeneticAgent implements Agent, Runnable {
 			//makeTestTuples2(); // - This is the 4 horisontal, 4 vertical and 9 squares setup
 		}
 	}
+
+	/**
+	 *
+	 * @param tuples
+	 */
 	public GeneticAgent(ArrayList<Tuple> tuples) {
-		this.tuples=tuples;
-		this.myId=id;
-		id+=1;
+		this.tuples = tuples;
+		this.myId = id;
+		id += 1;
 	}
+	
 	/**
 	 * the set of vertical, horisontal and square tuples of length 4
 	 */
