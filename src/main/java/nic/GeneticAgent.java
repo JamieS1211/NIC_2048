@@ -32,8 +32,6 @@ public class GeneticAgent implements Agent, Runnable {
 	public RandomDataGenerator random = new RandomDataGenerator(new MersenneTwister(123));
 	public static Action[] ACTIONS = { Action.UP, Action.RIGHT, Action.DOWN, Action.LEFT };
 	private ArrayList<Tuple> tuples;
-	private int myId;
-	private static int id=0;
 	public static final int[] stateMax = {16384, 8192, 4096, 2048, 1024};
 	public static final int[] stateIterations = {25, 20, 15, 10, 5};
 	//public static final int[] stateIterations = {45, 35, 25, 15, 5};
@@ -148,50 +146,23 @@ public class GeneticAgent implements Agent, Runnable {
 	 * Set of 2 rectangular tuples of length 6 and 2 tuples of length 4
 	 */
 	public void makeTestTuples() {
-
 		System.out.println("Making test tuples");
+
 		ArrayList<Tuple> tuples = new ArrayList<Tuple>();
 		double[] lookup_table1 = new double[(int) Math.pow(15, 6)];
 		double[] lookup_table2 = new double[(int) Math.pow(15, 6)];
 		double[] lookup_table3 = new double[(int) Math.pow(15, 4)];
 		double[] lookup_table4 = new double[(int) Math.pow(15, 4)];
 
-		ArrayList<Pair<Integer, Integer>> t1_cells = new ArrayList<>();
-		t1_cells.add(new Pair<>(0, 0));
-		t1_cells.add(new Pair<>(0, 1));
-		t1_cells.add(new Pair<>(1, 1));
-		t1_cells.add(new Pair<>(2, 1));
-		t1_cells.add(new Pair<>(2, 0));
-		t1_cells.add(new Pair<>(1, 0));
-		Tuple t1 = new Tuple(lookup_table1, t1_cells);
+		TupleGenotype gt1 = new TupleGenotype(new Pair(0, 0), 1, new int[] {1, 1, 0, 1, 1});
+		TupleGenotype gt2 = new TupleGenotype(new Pair(0, 1), 1, new int[] {1, 1, 0, 1, 1});
+		TupleGenotype gt3 = new TupleGenotype(new Pair(0, 2), 3, new int[] {0, 0, 0});
+		TupleGenotype gt4 = new TupleGenotype(new Pair(0, 3), 3, new int[] {0, 0, 0});
 
-		ArrayList<Pair<Integer, Integer>> t2_cells = new ArrayList<>();
-		t2_cells.add(new Pair<>(0, 1));
-		t2_cells.add(new Pair<>(0, 2));
-		t2_cells.add(new Pair<>(1, 2));
-		t2_cells.add(new Pair<>(2, 2));
-		t2_cells.add(new Pair<>(2, 1));
-		t2_cells.add(new Pair<>(1, 1));
-		Tuple t2 = new Tuple(lookup_table2, t2_cells);
-
-		ArrayList<Pair<Integer, Integer>> t3_cells = new ArrayList<>();
-		t3_cells.add(new Pair<>(0, 2));
-		t3_cells.add(new Pair<>(1, 2));
-		t3_cells.add(new Pair<>(2, 2));
-		t3_cells.add(new Pair<>(3, 2));
-		Tuple t3 = new Tuple(lookup_table3, t3_cells);
-
-		ArrayList<Pair<Integer, Integer>> t4_cells = new ArrayList<>();
-		t4_cells.add(new Pair<>(0, 3));
-		t4_cells.add(new Pair<>(1, 3));
-		t4_cells.add(new Pair<>(2, 3));
-		t4_cells.add(new Pair<>(3, 3));
-		Tuple t4 = new Tuple(lookup_table4, t4_cells);
-
-		tuples.add(t1);
-		tuples.add(t2);
-		tuples.add(t3);
-		tuples.add(t4);
+		tuples.add(new Tuple(lookup_table1, gt1.buildTupleCells()));
+		tuples.add(new Tuple(lookup_table2, gt2.buildTupleCells()));
+		tuples.add(new Tuple(lookup_table3, gt3.buildTupleCells()));
+		tuples.add(new Tuple(lookup_table4, gt4.buildTupleCells()));
 
 		this.tuples = tuples;
 	}
