@@ -80,10 +80,6 @@ public class TupleGenotype {
      */
     TupleGenotype(TupleGenotype parent1, TupleGenotype parent2) throws IllegalArgumentException {
         this();
-
-        if (parent1.turns.length != parent2.turns.length) {
-            throw new IllegalArgumentException();
-        }
  
         Random rand = new Random();
         TupleGenotype[] parents = {parent1, parent2};
@@ -93,20 +89,15 @@ public class TupleGenotype {
 
         choose = rand.nextInt(1);
         this.startDirection = parents[choose].startDirection;
-
-        // Turns
-        this.turns = new int[parent1.turns.length];
-        for (int i = 0; i < this.turns.length; i++) {
-            choose = rand.nextInt(1);
-            this.turns[i] = parents[choose].turns[i];
-        }
-        
+           
         boolean valid = false;
+        int cTurn;
         while (!valid) {
-        	this.turns = new int[parent1.turns.length];
+        	this.turns = new int[parents[choose].turns.length];
             for (int i = 0; i < this.turns.length; i++) {
                 choose = rand.nextInt(1);
-                this.turns[i] = parents[choose].turns[i];
+                cTurn = rand.nextInt(parents[choose].turns.length);
+                this.turns[i] = parents[choose].turns[cTurn];
             }
             
             valid = this.isTupleValid(this.buildTupleCells());
