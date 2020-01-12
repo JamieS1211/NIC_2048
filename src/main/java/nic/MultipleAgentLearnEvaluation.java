@@ -23,13 +23,18 @@ public class MultipleAgentLearnEvaluation {
 		agents.clear();
  		RandomDataGenerator random = new RandomDataGenerator(new MersenneTwister());
  		//RandomDataGenerator random = new RandomDataGenerator(new MersenneTwister(random_seed));
+ 		Tuple temp_tuple;
+ 		TupleGenotype temp_geno;
  		for (int i =0 ; i<NUMBER_OF_AGENTS;i++) {
  			ArrayList<Tuple> tuples = new ArrayList<>();
  			
  			for (int j =0;j<4;j++) {
  	 			int randomLength = random.nextInt(2, 6);
  	 			double [] lut = new double[(int)Math.pow(15, randomLength)];
- 	 			tuples.add(new Tuple(lut,new TupleGenotype(randomLength).buildTupleCells()));
+ 	 			temp_geno = new TupleGenotype(randomLength);
+ 	 			temp_tuple = new Tuple(lut,temp_geno.buildTupleCells());
+ 	 			temp_tuple.setGenoType(temp_geno);
+ 	 			tuples.add(temp_tuple);
  			}
  			
  			agents.add(new GeneticAgent(tuples));
@@ -66,17 +71,27 @@ public class MultipleAgentLearnEvaluation {
 	}
 	public static void main(String[] args) {
 		
-		createNewAgents();
-		startAgents();
+		//createNewAgents();
+		//startAgents();
 		
-		/*
+		
+		
+		
 		createAgents();
+		ArrayList<Tuple> tuples = new ArrayList<Tuple>();
+		
 		for(GeneticAgent g :agents) {
 			for (Tuple t :g.tuples) {
-				System.out.println(t.scores);
+				tuples.add(t);
+				//System.out.println(t.scores);
 			}
 		}
-		*/
+		//System.out.println(tuples.size());
+		ArrayList<Tuple> newgen = TupleGenotype.new_generation(tuples);
+		newgen.get(newgen.size()-2).genotype.print();
+		
+		
+		
  	}
 
 	

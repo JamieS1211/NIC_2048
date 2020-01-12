@@ -2,11 +2,12 @@ package nic;
 
 import put.ci.cevo.util.Pair;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
 
-public class TupleGenotype {
+public class TupleGenotype implements Serializable{
     public Pair<Integer, Integer> startPosition;
     public int startDirection;
     public int[] turns;
@@ -29,7 +30,7 @@ public class TupleGenotype {
     /**
      * Private constructor to add directions
      */
-    private TupleGenotype() {
+    private TupleGenotype()  {
         this.directions.add(UP);
         this.directions.add(LEFT);
         this.directions.add(DOWN);
@@ -40,7 +41,7 @@ public class TupleGenotype {
      * Create a new random tuple genotype of given size
      * @param tupleSize - Size of the tuple
      */
-    TupleGenotype(int tupleSize) {
+    TupleGenotype(int tupleSize)  {
         this();
 
         Random rand = new Random();
@@ -146,10 +147,11 @@ public class TupleGenotype {
     void print() {
         System.out.println("Start Position: " + this.startPosition);
         System.out.println("Start direction: " + this.startDirection);
+        System.out.println(this.turnDirections.length);
 
         for (int i = 0; i < this.turns.length; i++) {
-            System.out.println("Turn" + i + " : " + this.turnDirections[i]);
-        }
+        	System.out.println("Turn" + i + " : " + this.turnDirections[i]);
+       }
 
         System.out.println();
     }
@@ -208,10 +210,9 @@ public class TupleGenotype {
         return tupleCells;
     }
     
-    ArrayList<Tuple> tournament(ArrayList<Tuple> population, int parents_amount){
+    static ArrayList<Tuple> tournament(ArrayList<Tuple> population, int parents_amount){
     	int num_children = 10;
     	int top_cat = 5;
-    	
     	ArrayList<Tuple> parents = new ArrayList<Tuple>();;
     	ArrayList<Tuple> top = new ArrayList<Tuple>();;
     	
@@ -223,11 +224,12 @@ public class TupleGenotype {
     		Tuple.sort(top);
     		parents.add(top.get(top.size()-1-j));
     		}
-    		  	
+    	
+    	//System.out.println(parents.size());
     	return parents; 
     }
     
-    ArrayList<Tuple> new_generation(ArrayList<Tuple> population){
+    static ArrayList<Tuple> new_generation(ArrayList<Tuple> population){
     	double mut_prob = 0.3;
     	//double cross_prob = 0.7;
     	int to_delete = 10;
@@ -238,21 +240,25 @@ public class TupleGenotype {
     	double[] lookup_table1;
     	Tuple child_tuple;
     	
+    	//System.out.println(population.size());
     	Tuple.sort(population);
-    	for (int i=population.size()-1;i>0;i--) {
+    	for (int i=0;i<to_delete;i++) {
     		population.remove(i);
     	}
-    	
+    	//System.out.println(population.size());
     	for (int i=0;i<to_delete;i++) {
     		lookup_table1 = new double[(int) Math.pow(15, 6)];
-    		o= Math.random();
-    		if (o <= mut_prob) {
-    			operator = 1;	
-    		}
+    		//o= Math.random();
+    		//if (o <= mut_prob) {
+    		//	operator = 1;	
+    		//}
     		
     		switch (operator) {
     		case 0:
     			parents = tournament(population, 2);
+    			//parents.get(0).genotype.print();
+    			//parents.get(1).genotype.print();
+    			//System.out.println(parents.size());
     			temp_child = new TupleGenotype(parents.get(0).genotype, parents.get(1).genotype);
     			child_tuple = new Tuple(lookup_table1,temp_child.buildTupleCells());
     			child_tuple.setGenoType(temp_child);
