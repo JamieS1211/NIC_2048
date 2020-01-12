@@ -2,6 +2,8 @@ package nic;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
+
 import put.ci.cevo.util.Pair;
 
 
@@ -12,6 +14,7 @@ public class Tuple implements Serializable {
 	private ArrayList<Integer> tupleKeys; 
 	private double current_value;
 	public ArrayList<Double> scores = new ArrayList<>();
+	public TupleGenotype genotype;
 	/**
 	 *
 	 * @param lookup
@@ -23,6 +26,30 @@ public class Tuple implements Serializable {
 
 		tupleKeys = new ArrayList<>();
 		current_value = 0;
+	}
+	
+	
+	
+	
+	public static ArrayList<Tuple> sort(ArrayList<Tuple> tuples){
+		//Ascending order sort
+		ArrayList<Tuple> sorted_tuples = new ArrayList<Tuple>();
+		ArrayList<Double> values = new ArrayList<Double>();
+		for (int i=0;i<tuples.size();i++) {
+			values.add(tuples.get(i).evaluateScores());
+		}
+		ArrayList<Double>sorted_values = new ArrayList<Double>(values);
+		Collections.sort(sorted_values);
+		for (int i=0;i<values.size();i++) {
+			sorted_tuples.add(tuples.get(values.indexOf(sorted_values.get(i))));
+		}
+		
+		return sorted_tuples;
+	}
+	
+	
+	public void setGenoType(TupleGenotype g) {
+		this.genotype = g;
 	}
 
 	/**
