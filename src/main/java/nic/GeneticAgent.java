@@ -31,7 +31,7 @@ public class GeneticAgent implements Agent, Runnable {
 
 	public RandomDataGenerator random = new RandomDataGenerator(new MersenneTwister(123));
 	public static Action[] ACTIONS = { Action.UP, Action.RIGHT, Action.DOWN, Action.LEFT };
-	private ArrayList<Tuple> tuples;
+	public ArrayList<Tuple> tuples;
 	public static final int[] stateMax = {16384, 8192, 4096, 2048, 1024};
 	public static final int[] stateIterations = {25, 20, 15, 10, 5};
 	//public static final int[] stateIterations = {45, 35, 25, 15, 5};
@@ -76,12 +76,14 @@ public class GeneticAgent implements Agent, Runnable {
 	 */
 	public GeneticAgent(int id) {
 		FileInputStream fileInputStream;
+		this.myId=id;
 		try {
 			fileInputStream = new FileInputStream("tuples" + id + ".bin");
 			ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
 			this.tuples = (ArrayList<Tuple>) objectInputStream.readObject();
 			objectInputStream.close();
 		} catch (IOException | ClassNotFoundException e) {
+			System.out.println("DID NOT FIND THE FILE "+"tuples" + id + ".bin");
 			//CHOOSE WHICH OF THE TUPLE SETUPS YOU WANT.
 			makeTestTuples(); // - This is the 2 6-tuples and 	2 4-tuples setup
 			//makeTestTuples2(); // - This is the 4 horisontal, 4 vertical and 9 squares setup
@@ -96,6 +98,10 @@ public class GeneticAgent implements Agent, Runnable {
 		this.tuples = tuples;
 		this.myId = id;
 		id += 1;
+	}
+	public GeneticAgent(ArrayList<Tuple> tuples,int id) {
+		this.tuples = tuples;
+		this.myId = id;
 	}
 	
 	/**
@@ -334,7 +340,7 @@ public class GeneticAgent implements Agent, Runnable {
 	 * @param state - starting state
 	 * @param learning_rate
 	 */
-	public void learnFromState(State2048 state, double learning_rate) {
+	public int learnFromState(State2048 state, double learning_rate) {
 
 		while (!state.isTerminal()) {
     		int reward = state.makeMove(argmax(new Board(state.getBoard())));
@@ -350,6 +356,7 @@ public class GeneticAgent implements Agent, Runnable {
     			}
     		}
     	}
+		return 1;
 	}
 
 	/**
@@ -374,7 +381,7 @@ public class GeneticAgent implements Agent, Runnable {
  	    		for (int j=0;j<stateMax.length;j++) {
  	    			if(stateMax[j]==max&&stateMax[j]>lastStateMax) {
  	    				for (int numberOfRepetitions=0;numberOfRepetitions<stateIterations[j];numberOfRepetitions++) {
- 	    					learnFromState(new State2048(state),learningRate);
+ 	    					i+=learnFromState(new State2048(state),learningRate);
  	    					lastStateMax=stateMax[j];
  	    				}
  	    				break;
@@ -409,6 +416,21 @@ public class GeneticAgent implements Agent, Runnable {
  		System.out.println("took "+String.valueOf((System.nanoTime()-startTime)/1_000_000_000)+" seconds for "+String.valueOf(numGames)+" games");
 
  	}
+	public void storeTuples() {
+		try {
+ 			FileOutputStream fileOutputStream;
+ 			fileOutputStream = new FileOutputStream("tuples"+String.valueOf(this.myId)+".bin");
+ 			ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
+ 			objectOutputStream.writeObject(tuples);
+ 			objectOutputStream.flush();
+ 			objectOutputStream.close();
+ 			//System.out.println("Stored"+" tuples"+String.valueOf(this.myId)+".bin");
+ 			//System.out.println("Finished writing files"+myId);
+ 		} catch (IOException e) {
+ 			e.printStackTrace();
+ 		}
+		
+	}
  	/**
  	 *
  	 * @param args
@@ -424,13 +446,15 @@ public class GeneticAgent implements Agent, Runnable {
  		RandomDataGenerator random = new RandomDataGenerator(new MersenneTwister());
  		//RandomDataGenerator random = new RandomDataGenerator(new MersenneTwister(random_seed));
  		ArrayList<GeneticAgent> agents = new ArrayList<>();
- 		for (int i =0 ; i<1;i++) {
+ 		for (int i =0 ; i<11;i++) {
  			ArrayList<Tuple> tuples = new ArrayList<>();
+ 			
  			for (int j =0;j<4;j++) {
- 	 			int randomLength = random.nextInt(2, 7);
+ 	 			int randomLength = random.nextInt(2, 6);
  	 			double [] lut = new double[(int)Math.pow(15, randomLength)];
  	 			tuples.add(new Tuple(lut,new TupleGenotype(randomLength).buildTupleCells()));
  			}
+ 			
  			agents.add(new GeneticAgent(tuples));
  		}
  		for (GeneticAgent g :agents) {
@@ -444,17 +468,8 @@ public class GeneticAgent implements Agent, Runnable {
  	}
  	@Override
  	public void run() {
- 		learnAgent(20000,0.0025,true);
- 		try {
- 			FileOutputStream fileOutputStream;
- 			fileOutputStream = new FileOutputStream("tuples"+String.valueOf(this.myId)+".bin");
- 			ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
- 			objectOutputStream.writeObject(tuples);
- 			objectOutputStream.flush();
- 			objectOutputStream.close();
- 		} catch (IOException e) {
- 			e.printStackTrace();
- 		}
-
+ 		learnAgent(25000,0.0025,false);
+ 		storeTuples();
+ 		MultipleAgentLearnEvaluation.report(this.myId);
  	}
  }

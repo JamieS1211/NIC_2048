@@ -11,7 +11,7 @@ public class Tuple implements Serializable {
 	private ArrayList<Pair<Integer, Integer>> tupleCells;
 	private ArrayList<Integer> tupleKeys; 
 	private double current_value;
-	private ArrayList<Double> scores = new ArrayList<>();
+	public ArrayList<Double> scores = new ArrayList<>();
 	/**
 	 *
 	 * @param lookup
@@ -32,6 +32,9 @@ public class Tuple implements Serializable {
 	 */
 	public void addScore(double score) {
 		scores.add(score);
+	}
+	public void clearScores() {
+		this.scores.clear();
 	}
 	public double evaluateScores() {
 		double sum =0;
@@ -77,6 +80,12 @@ public class Tuple implements Serializable {
 	 * @param update
 	 * @return
 	 */
+	public double[] getLookupTable(){
+		return this.tupleLookupTable;
+	}
+	public void refreshLookupTable() {
+		this.tupleLookupTable= new double[(int)Math.pow(15,this.tupleCells.size())];;
+	}
 	public double evaluateBoardReflection(int[][] afterstate, boolean update) {
 		int key = afterstate[(-tupleCells.get(0).first() + 3) % 4][tupleCells.get(0).second()];
 		int base15 = 15;
