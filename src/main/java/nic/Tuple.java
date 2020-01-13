@@ -80,11 +80,11 @@ public class Tuple implements Serializable {
 	 * @return
 	 */
 	private double evaluateScores() {
-		double sum =0;
-		for (Double score :scores) {
-			sum+=score;
+		double sum = 0;
+		for (Double score : scores) {
+			sum += score;
 		}
-		return (sum/=scores.size());
+		return (sum /= scores.size());
 	}
 
 	/**

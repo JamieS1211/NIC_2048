@@ -301,7 +301,8 @@ public class TupleGenotype implements Serializable{
      * @param population
      * @param random
      */
-    public static void shuffle(ArrayList<Tuple> population, RandomDataGenerator random) {
+    public static void shuffle(ArrayList<Tuple> population, RandomDataGenerator random, ArrayList<GeneticAgent> agentList) {
+
     	for (int i = 0; i < MultipleAgentLearnEvaluation.NUMBER_OF_AGENTS; i++) {
  			ArrayList<Tuple> tuples = new ArrayList<>();
  			for (int j = 0; j < 4; j++) {
@@ -317,6 +318,7 @@ public class TupleGenotype implements Serializable{
 
  			GeneticAgent g = new GeneticAgent(tuples, i);
  			g.storeTuples();
+ 			agentList.add(g);
  		}
     }
 }

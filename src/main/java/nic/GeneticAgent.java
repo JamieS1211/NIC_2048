@@ -72,7 +72,7 @@ public class GeneticAgent implements Agent, Runnable {
 	 */
 	public GeneticAgent(int id) {
 		FileInputStream fileInputStream;
-		this.myId=id;
+		this.myId = id;
 		try {
 			fileInputStream = new FileInputStream("tuples" + id + ".bin");
 			ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
@@ -303,7 +303,7 @@ public class GeneticAgent implements Agent, Runnable {
 
  	    	}
  	    }
- 		System.out.println("took "+ (System.nanoTime() - startTime) / 1_000_000_000 +" seconds for "+ numGames +" games");
+ 		System.out.println("took " + (System.nanoTime() - startTime) / 1_000_000_000 + " seconds for " + numGames + " games");
  	}
 
 	/**

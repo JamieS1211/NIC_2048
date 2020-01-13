@@ -5,18 +5,16 @@ import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.commons.math3.random.RandomDataGenerator;
 
 public class MultipleAgentLearnEvaluation {
-	private static final ArrayList<Integer> done= new ArrayList<>();
+	private static final ArrayList<Integer> done = new ArrayList<>();
 	private static final ArrayList<GeneticAgent> agents = new ArrayList<>();
-	private static int id = 0 ;
 	private static int evaluations = 0 ;
-	private static int overallEvaluations = 5;
+	private static int overallEvaluations = 6;
 	public static final int NUMBER_OF_AGENTS = 10; // Due to memory limitations
 
 	/**
 	 *
 	 */
 	private static void createAgents() {
-		id = 0;
 		agents.clear();
  		//RandomDataGenerator random = new RandomDataGenerator(new MersenneTwister(random_seed));
 
@@ -37,13 +35,14 @@ public class MultipleAgentLearnEvaluation {
 
  		for (int i = 0; i < NUMBER_OF_AGENTS; i++) {
  			ArrayList<Tuple> tuples = new ArrayList<>();
- 			
+
+ 			// Each agent has 4 tuples (length 2-6)
  			for (int j = 0; j < 4; j++) {
  	 			int randomLength = random.nextInt(2, 6);
  	 			double [] lut = new double[(int) Math.pow(15, randomLength)];
 
  	 			temp_geno = new TupleGenotype(randomLength);
- 	 			temp_tuple = new Tuple(lut,temp_geno.buildTupleCells());
+ 	 			temp_tuple = new Tuple(lut, temp_geno.buildTupleCells());
  	 			temp_tuple.setGenoType(temp_geno);
  	 			tuples.add(temp_tuple);
  			}
@@ -60,37 +59,39 @@ public class MultipleAgentLearnEvaluation {
 		done.add(id);
 
 		if (done.size() == NUMBER_OF_AGENTS) {
+			done.clear();
+
 			Thread temp = new Thread(() -> {
-				if (overallEvaluations > 4) {
-					System.out.println("Running...");
-					agents.clear();
-					AgentEvaluation.id=0;
-					AgentEvaluation.main(new String[0]);
+				evaluations += 1;
 
-					if (evaluations < 0) {
-						done.clear();
+				System.out.println();
+				System.out.println("Running evaluation: " + evaluations);
+				System.out.println();
 
-						createAgents();
-						startAgents();
-					} else {
-						evaluations = 0;
-						overallEvaluations += 1;
-						done.clear();
-						ArrayList<Tuple> tuples = new ArrayList<>();
-						createAgents();
+				AgentEvaluation.id = 0;
+				AgentEvaluation.main(new String[0]);
 
-						for (GeneticAgent g : agents) {
-							for (Tuple t : g.tuples) {
-								tuples.add(t);
-							}
+				if (evaluations == overallEvaluations) {
+					System.out.println("End");
+
+				} else if (evaluations % 2 == 0) {
+					System.out.println("Breeding process");
+
+					// Collect all tuples into one list
+					ArrayList<Tuple> tuples = new ArrayList<>();
+					for (GeneticAgent g : agents) {
+						for (Tuple t : g.tuples) {
+							tuples.add(t);
 						}
-
-						ArrayList<Tuple> newgen = TupleGenotype.new_generation(tuples);
-						TupleGenotype.shuffle(newgen, new RandomDataGenerator(new MersenneTwister()));
-						createAgents();
 					}
+					agents.clear();
 
-					evaluations += 1;
+					ArrayList<Tuple> newgen = TupleGenotype.new_generation(tuples); // Removes tuple from tuples array list
+					TupleGenotype.shuffle(newgen, new RandomDataGenerator(new MersenneTwister()), agents);
+					startAgents();
+				} else {
+					createAgents();
+					startAgents();
 				}
 			});
 		
