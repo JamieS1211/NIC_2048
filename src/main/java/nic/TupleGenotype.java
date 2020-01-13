@@ -111,6 +111,7 @@ public class TupleGenotype implements Serializable {
             isValid = isTupleValid(this.buildTupleCells());
         }
     }
+
     /**
      * Check if tuple is valid
      * @param tupleCells

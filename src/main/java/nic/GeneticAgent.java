@@ -28,7 +28,6 @@ import put.game2048.Board;
 
 
 public class GeneticAgent implements Agent {
-
 	public RandomDataGenerator random = new RandomDataGenerator(new MersenneTwister(123));
 	public static Action[] ACTIONS = { Action.UP, Action.RIGHT, Action.DOWN, Action.LEFT };
 	private ArrayList<Tuple> tuples;
@@ -82,7 +81,7 @@ public class GeneticAgent implements Agent {
 	}
 
 	/**
-	 * 
+	 *
 	 * Evaluate the given state-action pair 
 	 * @param current_state
 	 * @param current_action
@@ -115,8 +114,8 @@ public class GeneticAgent implements Agent {
 
 	/**
 	 * Evaluate the afterstate value for current tuples
-	 * @param current_state
-	 * @param update (whether to update the last key stored in tuple)
+	 * @param current_state - current board state
+	 * @param update - whether to update the last key stored in tuple
 	 * @return
 	 */
 	public double evaluateAfterstate(State2048 current_state, boolean update){
@@ -164,11 +163,11 @@ public class GeneticAgent implements Agent {
 	}
 
 	/**
-	 *
-	 * @param board
-	 * @param possibleActions
-	 * @param maxTime
-	 * @return
+	 * Chose the most promising move
+	 * @param board - Current board state
+	 * @param possibleActions - Possible actions given the board state
+	 * @param maxTime - Maximum time to make a decision
+	 * @return - Move to make
 	 */
 	public Action chooseAction(Board board, List<Action> possibleActions, Duration maxTime) {
 		Preconditions.checkArgument(0 < possibleActions.size());
@@ -177,8 +176,8 @@ public class GeneticAgent implements Agent {
 
 	/**
 	 * Plays a several games starting from the given state (and learns them)
-	 * @param state - starting state
-	 * @param learning_rate
+	 * @param state - Starting state
+	 * @param learning_rate - Rate of errors to adjust tuple values
 	 */
 	public void learnFromState(State2048 state, double learning_rate) {
 		
@@ -199,9 +198,9 @@ public class GeneticAgent implements Agent {
 	}
 
 	/**
-	 *
-	 * @param numGames
-	 * @param learningRate
+	 * Perform a tuple learning operation with the current agent
+	 * @param numGames - Number of gains to train on
+	 * @param learningRate - Rate of errors to adjust tuple values
 	 */
 	public void learnAgent(int numGames, double learningRate) {
 		RandomDataGenerator random = new RandomDataGenerator(new MersenneTwister());
@@ -244,20 +243,24 @@ public class GeneticAgent implements Agent {
 	    }
 
 	}
-public void storeTuples(){
 
-	try {
-		FileOutputStream fileOutputStream;
-		fileOutputStream = new FileOutputStream("tuples.bin");
-		ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
-		objectOutputStream.writeObject(tuples);
-		objectOutputStream.flush();
-		objectOutputStream.close();
-	} catch (IOException e) {
-		e.printStackTrace();
+	/**
+	 * Store tuples to a tuples.bin file
+	 */
+	public void storeTuples() {
+		try {
+			FileOutputStream fileOutputStream;
+			fileOutputStream = new FileOutputStream("tuples.bin");
+			ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
+			objectOutputStream.writeObject(tuples);
+			objectOutputStream.flush();
+			objectOutputStream.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 	}
 
-}
 	/**
 	 *
 	 * @param args

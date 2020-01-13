@@ -14,9 +14,9 @@ public class Tuple implements Serializable {
 	private TupleGenotype genotype;
 
 	/**
-	 *
-	 * @param lookup
-	 * @param genotype
+	 * Create new tuple
+	 * @param lookup - Lookup table to use
+	 * @param genotype - Genotype of tuple
 	 */
 	Tuple(double[] lookup, TupleGenotype genotype) {
 		this.tupleLookupTable = lookup;
@@ -28,9 +28,9 @@ public class Tuple implements Serializable {
 	}
 
 	/**
-	 *
-	 * @param boardState
-	 * @return
+	 * Find the key for the given board state
+	 * @param boardState - Board state to evaluate
+	 * @return - Key were the quality value is stored
 	 */
 	public int findKey(int[][] boardState) {
 		int key = boardState[tupleCells.get(0).first()][tupleCells.get(0).second()];
@@ -47,9 +47,9 @@ public class Tuple implements Serializable {
 	/**
 	 * Each tuple keeps its current key used for last action evaluation.
      * use update=true only if you are going to update the value for that action
-	 * @param afterstate -
+	 * @param afterstate - board state
 	 * @param update - whether to keep the value for later update
-	 * @return
+	 * @return - quality estimation of board
 	 */
 	public double evaluateBoard(int[][] afterstate, boolean update) {
 		int key = findKey(afterstate);
@@ -64,10 +64,10 @@ public class Tuple implements Serializable {
 	}
 
 	/**
-	 *
-	 * @param afterstate
-	 * @param update
-	 * @return
+	 * Evaluate the board taking into account tuple reflection
+	 * @param afterstate - board state
+	 * @param update - whether to keep the value for later update
+	 * @return - quality estimation of board
 	 */
 	public double evaluateBoardReflection(int[][] afterstate, boolean update) {
 		int key = afterstate[(-tupleCells.get(0).first() + 3) % 4][tupleCells.get(0).second()];

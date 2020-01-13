@@ -46,16 +46,18 @@ public class RunMultithreadedFullTraining {
         // Generate initial population
         ArrayList<GenoTypeScore> population = new ArrayList<>();
         for (tupleID = 0; tupleID < agentCount * tuplesPerAgent; tupleID++) {
-            population.add(new GenoTypeScore(tupleID, tupleMinLength, tupleMaxLength));
+            population.add(new GenoTypeScore(tupleMinLength, tupleMaxLength));
         }
 
+        // Each round tuples will be distributed between agents
         for (int round = 0; round < totalRounds; round++) {
+            // Breed new tuples based on best of population
             if (round % roundsBetweenBreeding == 0 && round > 0) {
                 System.out.println("");
                 System.out.println("Breeding");
                 System.out.println("");
 
-                // Sort by score / games plaid
+                // Sort by (score / games plaid)
                 population = sortGenoTypeScoreList(population);
 
 
@@ -65,7 +67,7 @@ public class RunMultithreadedFullTraining {
                     population.remove(i);
                 }
 
-                //Breeding
+                // Breeding via tournament approach
                 int top_cat = 5;
                 GenoTypeScore parent1;
                 GenoTypeScore parent2;
@@ -130,11 +132,11 @@ public class RunMultithreadedFullTraining {
 
         population = sortGenoTypeScoreList(population);
 
-        // Take top 4 values and build final agent
+        // Take top 4 values and build final agent (this is agent from the tuples we believe are best)
         TupleGenotype[] bestTupleGenotypes = {population.get(0).genotype, population.get(1).genotype, population.get(2).genotype, population.get(3).genotype};
         GeneticAgent bestTupleAgent = new GeneticAgent(bestTupleGenotypes);
 
-        // Train final agent for X
+        // Train final agent for a long period of time
         for (int i = 0; i < 100; i++) {
             bestTupleAgent.learnAgent(50000, 0.0025);
             System.out.println("Saving");

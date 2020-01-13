@@ -1,6 +1,5 @@
 package nic;
 
-
 public enum EnumAbsoluteDirections {
     UP       (0, 0, -1),
     LEFT     (1,-1, 0),

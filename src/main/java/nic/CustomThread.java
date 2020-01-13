@@ -1,14 +1,10 @@
 package nic;
 
-import put.game2048.Agent;
-
-import java.io.IOException;
-
 public class CustomThread implements Runnable {
-    Thread thread;
-    GenoTypeScore[] genoTypeScores;
+    private final Thread thread;
+    private final GenoTypeScore[] genoTypeScores;
 
-    boolean done = false;
+    private boolean done = false;
     double score = 0;
 
     CustomThread(GenoTypeScore[] genoTypeScores) {

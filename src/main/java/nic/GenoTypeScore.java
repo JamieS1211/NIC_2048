@@ -4,19 +4,16 @@ import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.commons.math3.random.RandomDataGenerator;
 
 public class GenoTypeScore {
-
-    public int id;
     public TupleGenotype genotype;
     public double score;
     public int roundsPlayed;
 
     /**
-     *
-     * @param id
-     * @param minLen
-     * @param maxLen
+     * Create new random instance between the min and max size
+     * @param minLen - Minimum tuple size
+     * @param maxLen - Maximum tuple size
      */
-    GenoTypeScore(int id, int minLen, int maxLen) {
+    GenoTypeScore(int minLen, int maxLen) {
         RandomDataGenerator rand = new RandomDataGenerator(new MersenneTwister());
         int size = rand.nextInt(minLen, maxLen);
         this.genotype = new TupleGenotype(size);
@@ -26,10 +23,11 @@ public class GenoTypeScore {
     }
 
     /**
-     *
+     * Create new instance
+     * @param genoTypeScore - Duplicate a GenoTypeScore
      */
-    GenoTypeScore(GenoTypeScore geno){
-        this.genotype = geno.genotype;
+    GenoTypeScore(GenoTypeScore genoTypeScore){
+        this.genotype = genoTypeScore.genotype;
         this.score = 0;
         this.roundsPlayed = 0;
     }
