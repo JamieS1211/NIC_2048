@@ -10,24 +10,24 @@ import java.util.Random;
 import org.apache.commons.math3.random.RandomDataGenerator;
 
 public class TupleGenotype implements Serializable{
-    public Pair<Integer, Integer> startPosition;
-    public int startDirection;
-    public int[] turns;
+    private Pair<Integer, Integer> startPosition;
+    private int startDirection;
+    private int[] turns;
 
-    private int chrom_amount = 3;
-    private int[] board_size = {4, 4};
+    private final int chrom_amount = 3;
+    private final int[] board_size = {4, 4};
 
     // Increasing index by 1 is a turn to left
-    public Pair<Integer, Integer> UP = new Pair<>(0, -1);
-    public Pair<Integer, Integer> LEFT = new Pair<>(-1, 0);
-    public Pair<Integer, Integer> DOWN = new Pair<>(0, 1);
-    public Pair<Integer, Integer> RIGHT = new Pair<>(1, 0);
-    public ArrayList<Pair<Integer, Integer>> directions = new ArrayList<>();
+    private final Pair<Integer, Integer> UP = new Pair<>(0, -1);
+    private final Pair<Integer, Integer> LEFT = new Pair<>(-1, 0);
+    private final Pair<Integer, Integer> DOWN = new Pair<>(0, 1);
+    private final Pair<Integer, Integer> RIGHT = new Pair<>(1, 0);
+    private final ArrayList<Pair<Integer, Integer>> directions = new ArrayList<>();
 
-    public int TURN_RIGHT = -1;
-    public int TURN_STRAIGHT = 0;
-    public int TURN_LEFT = 1;
-    public int[] turnDirections = {TURN_RIGHT, TURN_STRAIGHT, TURN_LEFT};
+    private final int TURN_RIGHT = -1;
+    private final int TURN_STRAIGHT = 0;
+    private final int TURN_LEFT = 1;
+    private final int[] turnDirections = {TURN_RIGHT, TURN_STRAIGHT, TURN_LEFT};
 
     /**
      * Private constructor to add directions
@@ -52,7 +52,7 @@ public class TupleGenotype implements Serializable{
         this.startDirection = rand.nextInt(directions.size());
         this.turns = new int[tupleSize - 1];
 
-        boolean valid = false;
+        boolean valid;
 
         do {
             for (int i = 0; i < tupleSize - 1; i++) {
@@ -82,7 +82,7 @@ public class TupleGenotype implements Serializable{
      * @param parent1 - Parent 1
      * @param parent2 - Parent 2
      */
-    TupleGenotype(TupleGenotype parent1, TupleGenotype parent2) throws IllegalArgumentException {
+    private TupleGenotype(TupleGenotype parent1, TupleGenotype parent2) throws IllegalArgumentException {
         this();
  
         Random rand = new Random();
@@ -112,7 +112,7 @@ public class TupleGenotype implements Serializable{
     /**
      * Mutate a tuple
      */
-    void mutate() {
+    private void mutate() {
         Random rand = new Random();
 
         int mutation = rand.nextInt(this.chrom_amount);
@@ -139,7 +139,6 @@ public class TupleGenotype implements Serializable{
                 int changing_turn = rand.nextInt(this.turnDirections.length);
                 this.turns[changing_turn] = rand.nextInt(this.turnDirections.length);
 
-                return;
         }
     }
 
@@ -163,7 +162,7 @@ public class TupleGenotype implements Serializable{
      * @param tupleCells
      * @return
      */
-    public boolean isTupleValid(ArrayList<Pair<Integer, Integer>> tupleCells) {
+    private boolean isTupleValid(ArrayList<Pair<Integer, Integer>> tupleCells) {
         // Check it doesn't go back on itself
         for (Pair<Integer, Integer> cell : tupleCells) {
             if (cell.first() < 0 || cell.first() >= 4 || cell.second() < 0 || cell.second() >= 4) {
@@ -211,29 +210,40 @@ public class TupleGenotype implements Serializable{
 
         return tupleCells;
     }
-    
-    static ArrayList<Tuple> tournament(ArrayList<Tuple> population, int parents_amount){
-    	int num_children = 10;
+
+    /**
+     *
+     * @param population
+     * @param parents_amount
+     * @return
+     */
+    private static ArrayList<Tuple> tournament(ArrayList<Tuple> population, int parents_amount){
     	int top_cat = 5;
-    	ArrayList<Tuple> parents = new ArrayList<Tuple>();;
-    	ArrayList<Tuple> top = new ArrayList<Tuple>();;
+    	ArrayList<Tuple> parents = new ArrayList<Tuple>();
+    	ArrayList<Tuple> top = new ArrayList<Tuple>();
     	
-    	for(int j=0; j<parents_amount;j++) {
+    	for (int j = 0; j < parents_amount; j++) {
     		Collections.shuffle(population);
-    		for(int p=0;p<top_cat;p++) {
+
+    		for(int p = 0; p < top_cat; p++) {
     			top.add(population.get(p));
     		}
+
     		Tuple.sort(top);
-    		parents.add(top.get(top.size()-1-j));
-    		}
+    		parents.add(top.get(top.size() - 1 - j));
+    	}
     	
     	//System.out.println(parents.size());
     	return parents; 
     }
-    
+
+    /**
+     *
+     * @param population
+     * @return
+     */
     static ArrayList<Tuple> new_generation(ArrayList<Tuple> population){
     	double mut_prob = 0.3;
-    	//double cross_prob = 0.7;
     	int to_delete = 10;
     	double o;
     	int operator = 0;
@@ -244,65 +254,69 @@ public class TupleGenotype implements Serializable{
     	
     	//System.out.println(population.size());
     	Tuple.sort(population);
-    	for (int i=0;i<to_delete;i++) {
+    	for (int i = 0; i < to_delete; i++) {
     		population.remove(i);
     	}
+
     	//System.out.println(population.size());
-    	for (int i=0;i<to_delete;i++) {
+    	for (int i = 0; i < to_delete; i++) {
     		lookup_table1 = new double[(int) Math.pow(15, 6)];
-    		o= Math.random();
-    		if (o <= mut_prob) {
+    		o = Math.random();
+
+    		if (o < mut_prob) {
     			operator = 1;	
     		}
     		
     		switch (operator) {
-    		case 0:
-    			parents = tournament(population, 2);
-    			temp_child = new TupleGenotype(parents.get(0).genotype, parents.get(1).genotype);
-    			child_tuple = new Tuple(lookup_table1,temp_child.buildTupleCells());
-    			child_tuple.setGenoType(temp_child);
-    			population.add(child_tuple);
-    			break;
-    			
-    		case 1:
-    			parents = tournament(population, 1);
-    			temp_child = parents.get(0).genotype;
-    			child_tuple = new Tuple(lookup_table1,temp_child.buildTupleCells());
-    			child_tuple.setGenoType(temp_child);
-    			population.add(child_tuple);
-    			break;
-    		
-    		default:
-    			parents = tournament(population, 2);
-    			temp_child = new TupleGenotype(parents.get(0).genotype, parents.get(1).genotype);
-    			temp_child.mutate();
-    			child_tuple = new Tuple(lookup_table1,temp_child.buildTupleCells());
-    			child_tuple.setGenoType(temp_child);
-    			population.add(child_tuple);	
-    		}
-    	}
+                case 0:
+                    parents = tournament(population, 2);
+                    temp_child = new TupleGenotype(parents.get(0).genotype, parents.get(1).genotype);
+                    child_tuple = new Tuple(lookup_table1,temp_child.buildTupleCells());
+                    child_tuple.setGenoType(temp_child);
+                    population.add(child_tuple);
+                    break;
+
+                case 1:
+                    parents = tournament(population, 1);
+                    temp_child = parents.get(0).genotype;
+                    child_tuple = new Tuple(lookup_table1, temp_child.buildTupleCells());
+                    child_tuple.setGenoType(temp_child);
+                    population.add(child_tuple);
+                    break;
+
+                default:
+                    parents = tournament(population, 2);
+                    temp_child = new TupleGenotype(parents.get(0).genotype, parents.get(1).genotype);
+                    temp_child.mutate();
+                    child_tuple = new Tuple(lookup_table1,temp_child.buildTupleCells());
+                    child_tuple.setGenoType(temp_child);
+                    population.add(child_tuple);
+                }
+            }
     	return population;
     }
-    
+
+    /**
+     *
+     * @param population
+     * @param random
+     */
     public static void shuffle(ArrayList<Tuple> population, RandomDataGenerator random) {
-    	
-    	for(int i=0;i<MultipleAgentLearnEvaluation.NUMBER_OF_AGENTS;i++) {
- 			ArrayList<Tuple> tuples= new ArrayList<>();
- 			for (int j =0;j<4;j++) {
- 				int tupleIndex=0;
- 				if (population.size()>1) {
- 					tupleIndex = random.nextInt(0, population.size()-1);
+    	for (int i = 0; i < MultipleAgentLearnEvaluation.NUMBER_OF_AGENTS; i++) {
+ 			ArrayList<Tuple> tuples = new ArrayList<>();
+ 			for (int j = 0; j < 4; j++) {
+ 				int tupleIndex = 0;
+
+ 				if (population.size() > 1) {
+ 					tupleIndex = random.nextInt(0, population.size() - 1);
  				}
+
  	 			tuples.add(population.get(tupleIndex));
  	 			population.remove(tupleIndex);
  			}
- 			GeneticAgent g = new GeneticAgent(tuples,i);
- 			
- 			
+
+ 			GeneticAgent g = new GeneticAgent(tuples, i);
  			g.storeTuples();
  		}
-    	
     }
-    
-    
 }

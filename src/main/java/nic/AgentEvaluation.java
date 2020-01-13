@@ -27,39 +27,38 @@ public class AgentEvaluation {
 		//RandomDataGenerator random = new RandomDataGenerator(new MersenneTwister(RANDOM_SEED));
 		MultipleGamesResult result = null;
 		
- 		for (int i =0 ; i<11;i++) {
+ 		for (int i = 0 ; i < 11; i++) {
 			AGENT = createAgentFactoryByReflection();
 			GeneticAgent g = (GeneticAgent)AGENT.get();
 			
 			result = new Game(ACTION_TIME_LIMIT).playMultiple(AGENT, REPEATS, random);
 
 			System.out.println(result.toCvsRow());
-			for(Tuple t:g.tuples) {
+			for(Tuple t : g.tuples) {
 				t.addScore(result.getScore().getMean());
 				//t.refreshLookupTable();
 				allTuples.add(t);
 			}
-	 		id+=1;
+	 		id += 1;
  		}
- 		for(int i=id-1;i>=0;i--) {
+
+ 		for (int i = id - 1; i >= 0; i--) {
  			ArrayList<Tuple> tuples= new ArrayList<>();
- 			for (int j =0;j<4;j++) {
- 				int tupleIndex=0;
- 				if (allTuples.size()>1) {
- 					tupleIndex = random.nextInt(0, allTuples.size()-1);
+ 			for (int j = 0; j < 4; j++) {
+ 				int tupleIndex = 0;
+
+ 				if (allTuples.size() > 1) {
+ 					tupleIndex = random.nextInt(0, allTuples.size() - 1);
  				}
  				
  	 			tuples.add(allTuples.get(tupleIndex));
  	 			allTuples.remove(tupleIndex);
  			}
- 			GeneticAgent g = new GeneticAgent(tuples,i);
- 			
+
+ 			GeneticAgent g = new GeneticAgent(tuples, i);
  			
  			g.storeTuples();
  		}
- 		
- 		
- 		
 	}
 
 	private static Supplier<Agent> createAgentFactoryByReflection() {

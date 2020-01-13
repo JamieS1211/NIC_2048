@@ -10,11 +10,12 @@ import put.ci.cevo.util.Pair;
 public class Tuple implements Serializable {
 	private static final long serialVersionUID = -94781376176241568L;
 	private double[] tupleLookupTable;
-	private ArrayList<Pair<Integer, Integer>> tupleCells;
-	private ArrayList<Integer> tupleKeys; 
+	private final ArrayList<Pair<Integer, Integer>> tupleCells;
+	private final ArrayList<Integer> tupleKeys;
 	private double current_value;
-	public ArrayList<Double> scores = new ArrayList<>();
+	private final ArrayList<Double> scores = new ArrayList<>();
 	public TupleGenotype genotype;
+
 	/**
 	 *
 	 * @param lookup
@@ -27,18 +28,22 @@ public class Tuple implements Serializable {
 		tupleKeys = new ArrayList<>();
 		current_value = 0;
 	}
-	
-	
-	
-	
+
+	/**
+	 *
+	 * @param tuples
+	 * @return
+	 */
 	public static ArrayList<Tuple> sort(ArrayList<Tuple> tuples){
 		//Ascending order sort
-		ArrayList<Tuple> sorted_tuples = new ArrayList<Tuple>();
-		ArrayList<Double> values = new ArrayList<Double>();
-		for (int i=0;i<tuples.size();i++) {
+		ArrayList<Tuple> sorted_tuples = new ArrayList<>();
+		ArrayList<Double> values = new ArrayList<>();
+
+		for (int i = 0; i < tuples.size(); i++) {
 			values.add(tuples.get(i).evaluateScores());
 		}
-		ArrayList<Double>sorted_values = new ArrayList<Double>(values);
+
+		ArrayList<Double>sorted_values = new ArrayList<>(values);
 		Collections.sort(sorted_values);
 		for (int i=0;i<values.size();i++) {
 			sorted_tuples.add(tuples.get(values.indexOf(sorted_values.get(i))));
@@ -46,10 +51,40 @@ public class Tuple implements Serializable {
 		
 		return sorted_tuples;
 	}
-	
-	
+
+	/**
+	 *
+	 * @param g
+	 */
 	public void setGenoType(TupleGenotype g) {
 		this.genotype = g;
+	}
+
+	/**
+	 *
+	 * @param score
+	 */
+	public void addScore(double score) {
+		scores.add(score);
+	}
+
+	/**
+	 *
+	 */
+	public void clearScores() {
+		this.scores.clear();
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	private double evaluateScores() {
+		double sum =0;
+		for (Double score :scores) {
+			sum+=score;
+		}
+		return (sum/=scores.size());
 	}
 
 	/**
@@ -57,20 +92,7 @@ public class Tuple implements Serializable {
 	 * @param boardState
 	 * @return
 	 */
-	public void addScore(double score) {
-		scores.add(score);
-	}
-	public void clearScores() {
-		this.scores.clear();
-	}
-	public double evaluateScores() {
-		double sum =0;
-		for (Double score :scores) {
-			sum+=score;
-		}
-		return (sum/=scores.size());
-	}
-	public int findKey(int[][] boardState) {
+	private int findKey(int[][] boardState) {
 		int key = boardState[tupleCells.get(0).first()][tupleCells.get(0).second()];
 		int base15 = 15;
 
@@ -103,16 +125,25 @@ public class Tuple implements Serializable {
 
 	/**
 	 *
-	 * @param afterstate
-	 * @param update
 	 * @return
 	 */
 	public double[] getLookupTable(){
 		return this.tupleLookupTable;
 	}
+
+	/**
+	 *
+	 */
 	public void refreshLookupTable() {
-		this.tupleLookupTable= new double[(int)Math.pow(15,this.tupleCells.size())];;
+		this.tupleLookupTable= new double[(int)Math.pow(15,this.tupleCells.size())];
 	}
+
+	/**
+	 *
+	 * @param afterstate
+	 * @param update
+	 * @return
+	 */
 	public double evaluateBoardReflection(int[][] afterstate, boolean update) {
 		int key = afterstate[(-tupleCells.get(0).first() + 3) % 4][tupleCells.get(0).second()];
 		int base15 = 15;
