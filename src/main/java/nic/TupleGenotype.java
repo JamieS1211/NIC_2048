@@ -115,31 +115,29 @@ public class TupleGenotype implements Serializable{
     private void mutate() {
         Random rand = new Random();
 
-        int mutation = rand.nextInt(this.chrom_amount);
+        boolean valid;
 
-        switch (mutation) {
+        do {
+            int mutation = rand.nextInt(this.chrom_amount);
+            switch (mutation) {
+                case 0:
+                    // Start Position
+                    this.startPosition = new Pair<>(rand.nextInt(3), rand.nextInt(3));
+                    break;
 
-            case 0:
-                // Start Position
-                int xstart = rand.nextInt(this.board_size[0] - 1);
-                int ystart = rand.nextInt(this.board_size[1] - 1);
-                this.startPosition = new Pair<>(xstart, ystart);
+                case 1:
+                    // Start Direction
+                    this.startDirection = rand.nextInt(this.directions.size());
+                    break;
 
-                return;
+                case 2:
+                    // Turns
+                    this.turns[rand.nextInt(this.turns.length - 1)] = rand.nextInt(this.turnDirections.length) - 1;
+                    break;
+            }
 
-            case 1:
-                // Start Direction
-                int direction = rand.nextInt(this.directions.size());
-                this.startDirection = direction;
-
-                return;
-
-            case 2:
-                // Turns
-                int changing_turn = rand.nextInt(this.turnDirections.length);
-                this.turns[changing_turn] = rand.nextInt(this.turnDirections.length);
-
-        }
+            valid = isTupleValid(this.buildTupleCells());
+        } while (!valid);
     }
 
     /**
@@ -214,27 +212,19 @@ public class TupleGenotype implements Serializable{
     /**
      *
      * @param population
-     * @param parents_amount
      * @return
      */
-    private static ArrayList<Tuple> tournament(ArrayList<Tuple> population, int parents_amount){
+    private static Tuple tournament(ArrayList<Tuple> population){
     	int top_cat = 5;
-    	ArrayList<Tuple> parents = new ArrayList<Tuple>();
-    	ArrayList<Tuple> top = new ArrayList<Tuple>();
-    	
-    	for (int j = 0; j < parents_amount; j++) {
-    		Collections.shuffle(population);
+    	ArrayList<Tuple> tournamentIndividuals = new ArrayList<>();
 
-    		for(int p = 0; p < top_cat; p++) {
-    			top.add(population.get(p));
-    		}
+    	Collections.shuffle(population);
 
-    		Tuple.sort(top);
-    		parents.add(top.get(top.size() - 1 - j));
+    	for (int p = 0; p < top_cat; p++) {
+    	    tournamentIndividuals.add(population.get(p));
     	}
-    	
-    	//System.out.println(parents.size());
-    	return parents; 
+
+    	return Tuple.sort(tournamentIndividuals).get(0);
     }
 
     /**
@@ -245,55 +235,35 @@ public class TupleGenotype implements Serializable{
     static ArrayList<Tuple> new_generation(ArrayList<Tuple> population){
     	double mut_prob = 0.3;
     	int to_delete = 10;
-    	double o;
-    	int operator = 0;
-    	ArrayList<Tuple> parents;
     	TupleGenotype temp_child;
     	double[] lookup_table1;
     	Tuple child_tuple;
     	
     	//System.out.println(population.size());
-    	Tuple.sort(population);
+    	ArrayList<Tuple> sortedPopulation = Tuple.sort(population);
+
     	for (int i = 0; i < to_delete; i++) {
-    		population.remove(i);
+    		sortedPopulation.remove(i);
     	}
 
     	//System.out.println(population.size());
     	for (int i = 0; i < to_delete; i++) {
-    		lookup_table1 = new double[(int) Math.pow(15, 6)];
-    		o = Math.random();
+            lookup_table1 = new double[(int) Math.pow(15, 6)];
 
-    		if (o < mut_prob) {
-    			operator = 1;	
-    		}
-    		
-    		switch (operator) {
-                case 0:
-                    parents = tournament(population, 2);
-                    temp_child = new TupleGenotype(parents.get(0).genotype, parents.get(1).genotype);
-                    child_tuple = new Tuple(lookup_table1,temp_child.buildTupleCells());
-                    child_tuple.setGenoType(temp_child);
-                    population.add(child_tuple);
-                    break;
-
-                case 1:
-                    parents = tournament(population, 1);
-                    temp_child = parents.get(0).genotype;
-                    child_tuple = new Tuple(lookup_table1, temp_child.buildTupleCells());
-                    child_tuple.setGenoType(temp_child);
-                    population.add(child_tuple);
-                    break;
-
-                default:
-                    parents = tournament(population, 2);
-                    temp_child = new TupleGenotype(parents.get(0).genotype, parents.get(1).genotype);
-                    temp_child.mutate();
-                    child_tuple = new Tuple(lookup_table1,temp_child.buildTupleCells());
-                    child_tuple.setGenoType(temp_child);
-                    population.add(child_tuple);
-                }
+            if (Math.random() < mut_prob) { // Mutation
+                TupleGenotype parent = tournament(sortedPopulation).genotype;
+                temp_child = new TupleGenotype(parent.startPosition, parent.startDirection, parent.turns);
+                temp_child.mutate();
+            } else { //Crossover
+                temp_child = new TupleGenotype(tournament(sortedPopulation).genotype, tournament(sortedPopulation).genotype);
             }
-    	return population;
+
+            child_tuple = new Tuple(lookup_table1, temp_child.buildTupleCells());
+            child_tuple.setGenoType(temp_child);
+            sortedPopulation.add(child_tuple);
+        }
+
+    	return sortedPopulation;
     }
 
     /**

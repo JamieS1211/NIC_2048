@@ -33,8 +33,8 @@ public class GeneticAgent implements Agent, Runnable {
 	public ArrayList<Tuple> tuples;
 	public static final int[] stateMax = {16384, 8192, 4096, 2048, 1024};
 	public static final int[] stateIterations = {25, 20, 15, 10, 5};
-	private static FileWriter fileWriter ;
-    private static  PrintWriter printWriter ;
+	private static FileWriter fileWriter;
+    private static  PrintWriter printWriter;
 	private static final SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss");
 
 	public int myId;
@@ -78,6 +78,8 @@ public class GeneticAgent implements Agent, Runnable {
 			ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
 			this.tuples = (ArrayList<Tuple>) objectInputStream.readObject();
 			objectInputStream.close();
+		} catch (OutOfMemoryError e) {
+			System.out.println("Test");
 		} catch (IOException | ClassNotFoundException e) {
 			System.out.println("DID NOT FIND THE FILE: tuples" + id + ".bin");
 			makeTestTuples();
@@ -330,7 +332,7 @@ public class GeneticAgent implements Agent, Runnable {
  	 * @throws IOException
  	 */
  	public static void main(String[] args) throws IOException {
- 		fileWriter= new FileWriter("run.tsv");
+ 		fileWriter = new FileWriter("run.tsv");
  		printWriter = new PrintWriter(fileWriter);
  		double learning_rate = 0.0025; // to have a better 'immediate' result use 0.01 but seems like in long term 0.0025 is better
  		int action_time_limit_ms = 1000;
@@ -362,7 +364,7 @@ public class GeneticAgent implements Agent, Runnable {
 
  	@Override
  	public void run() {
- 		learnAgent(1,0.0025,false);
+ 		learnAgent(500,0.0025,false);
  		storeTuples();
  		MultipleAgentLearnEvaluation.report(this.myId);
  	}

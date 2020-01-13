@@ -43,9 +43,9 @@ public class Tuple implements Serializable {
 			values.add(tuples.get(i).evaluateScores());
 		}
 
-		ArrayList<Double>sorted_values = new ArrayList<>(values);
+		ArrayList<Double> sorted_values = new ArrayList<>(values);
 		Collections.sort(sorted_values);
-		for (int i=0;i<values.size();i++) {
+		for (int i = 0; i < values.size(); i++) {
 			sorted_tuples.add(tuples.get(values.indexOf(sorted_values.get(i))));
 		}
 		

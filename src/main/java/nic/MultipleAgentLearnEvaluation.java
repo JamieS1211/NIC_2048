@@ -8,7 +8,7 @@ public class MultipleAgentLearnEvaluation {
 	private static final ArrayList<Integer> done = new ArrayList<>();
 	private static final ArrayList<GeneticAgent> agents = new ArrayList<>();
 	private static int evaluations = 0 ;
-	private static int overallEvaluations = 6;
+	private static int overallEvaluations = 60;
 	public static final int NUMBER_OF_AGENTS = 10; // Due to memory limitations
 
 	/**
@@ -74,7 +74,7 @@ public class MultipleAgentLearnEvaluation {
 				if (evaluations == overallEvaluations) {
 					System.out.println("End");
 
-				} else if (evaluations % 2 == 0) {
+				} else if (evaluations % 5 == 0) {
 					System.out.println("Breeding process");
 
 					// Collect all tuples into one list
