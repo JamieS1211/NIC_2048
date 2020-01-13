@@ -28,17 +28,15 @@ import put.game2048.Board;
 
 
 public class GeneticAgent implements Agent, Runnable {
+
 	public RandomDataGenerator random = new RandomDataGenerator(new MersenneTwister(123));
 	public static Action[] ACTIONS = { Action.UP, Action.RIGHT, Action.DOWN, Action.LEFT };
-	public ArrayList<Tuple> tuples;
+	private ArrayList<Tuple> tuples;
 	public static final int[] stateMax = {16384, 8192, 4096, 2048, 1024};
 	public static final int[] stateIterations = {25, 20, 15, 10, 5};
-	private static FileWriter fileWriter;
-    private static  PrintWriter printWriter;
-	private static final SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss");
+	//public static final int[] stateIterations = {45, 35, 25, 15, 5};
 
-	public int myId;
-	public static int id = 0;
+	private static final SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss");
 
 	/**
 	 *
@@ -51,9 +49,11 @@ public class GeneticAgent implements Agent, Runnable {
 			fileInputStream = new FileInputStream("tuples.bin");
 			ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
 			this.tuples = (ArrayList<Tuple>) objectInputStream.readObject();
-			objectInputStream.close();
+			objectInputStream.close(); 
 		} catch (IOException | ClassNotFoundException e) {
-			makeTestTuples();
+			//CHOOSE WHICH OF THE TUPLE SETUPS YOU WANT.
+			makeTestTuples(); // - This is the 2 6-tuples and 	2 4-tuples setup
+			//makeTestTuples2(); // - This is the 4 horisontal, 4 vertical and 9 squares setup
 		}
 	}
 
@@ -67,52 +67,68 @@ public class GeneticAgent implements Agent, Runnable {
 	}
 
 	/**
-	 *
-	 * @param id
+	 * the set of vertical, horisontal and square tuples of length 4
 	 */
-	public GeneticAgent(int id) {
-		FileInputStream fileInputStream;
-		this.myId = id;
-		try {
-			fileInputStream = new FileInputStream("tuples" + id + ".bin");
-			ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
-			this.tuples = (ArrayList<Tuple>) objectInputStream.readObject();
-			objectInputStream.close();
-		} catch (OutOfMemoryError e) {
-			System.out.println("Test");
-		} catch (IOException | ClassNotFoundException e) {
-			System.out.println("DID NOT FIND THE FILE: tuples" + id + ".bin");
-			makeTestTuples();
+	public void makeTestTuples2() {
+		System.out.println("Making test tuples");
+		ArrayList<Tuple> tuples = new ArrayList<Tuple>();
+		double[] lookup_table1 = new double[(int) Math.pow(15, 4)];
+
+		for (int i = 0; i < 4; i++) {
+			//Map<String, Double> lookup_table1 = new HashMap<String, Double>();
+
+			ArrayList<Pair<Integer, Integer>> t1_cells = new ArrayList<>();
+			t1_cells.add(new Pair<>(0, i));
+			t1_cells.add(new Pair<>(1, i));
+			t1_cells.add(new Pair<>(2, i));
+			t1_cells.add(new Pair<>(3, i));
+
+			Tuple t1 = new Tuple(lookup_table1, t1_cells);
+			tuples.add(t1);
 		}
-	}
 
-	/**
-	 *
-	 * @param tuples
-	 */
-	public GeneticAgent(ArrayList<Tuple> tuples) {
+		double[] lookup_table2 = new double[(int) Math.pow(15, 4)];
+
+		for (int i = 0; i < 4; i++) {
+			//Map<String, Double> lookup_table2 = new HashMap<String, Double>();
+
+			ArrayList<Pair<Integer, Integer>> t1_cells = new ArrayList<>();
+			t1_cells.add(new Pair<>(i, 0));
+			t1_cells.add(new Pair<>(i, 1));
+			t1_cells.add(new Pair<>(i, 2));
+			t1_cells.add(new Pair<>(i, 3));
+
+			Tuple t1 = new Tuple(lookup_table2, t1_cells);
+			tuples.add(t1);
+		}
+
+		double[] lookup_table3 =  new double[(int) Math.pow(15, 4)];
+
+		for (int i = 0; i < 3; i++) {
+			for(int j = 0; j < 3; j++) {
+				//Map<String, Double> lookup_table3 = new HashMap<String, Double>();
+				ArrayList<Pair<Integer, Integer>> t1_cells = new ArrayList<>();
+				t1_cells.add(new Pair<>(i, j));
+				t1_cells.add(new Pair<>(i + 1, j));
+				t1_cells.add(new Pair<>(i + 1, j + 1));
+				t1_cells.add(new Pair<>(i, j + 1));
+
+
+				Tuple t1 = new Tuple(lookup_table3, t1_cells);
+				tuples.add(t1);
+			}
+		}
+
 		this.tuples = tuples;
-		this.myId = id;
-		id += 1;
 	}
 
 	/**
-	 *
-	 * @param tuples
-	 * @param id
-	 */
-	public GeneticAgent(ArrayList<Tuple> tuples,int id) {
-		this.tuples = tuples;
-		this.myId = id;
-	}
-
-	/**
-	 * Set of 2 rectangular tuples of length 6 and 2 tuples of length 4
+	 * Set of 2 rectangular tuples of length 6 and 2 tuples of length 4 
 	 */
 	public void makeTestTuples() {
 		System.out.println("Making test tuples");
 
-		ArrayList<Tuple> tuples = new ArrayList<>();
+		ArrayList<Tuple> tuples = new ArrayList<Tuple>();
 		double[] lookup_table1 = new double[(int) Math.pow(15, 6)];
 		double[] lookup_table2 = new double[(int) Math.pow(15, 6)];
 		double[] lookup_table3 = new double[(int) Math.pow(15, 4)];
@@ -133,7 +149,63 @@ public class GeneticAgent implements Agent, Runnable {
 
 	/**
 	 *
-	 * Evaluate the given state-action pair
+	 */
+	public void makeTestTuples3() {
+		System.out.println("Making test tuples");
+		ArrayList<Tuple> tuples= new ArrayList<Tuple>();
+		double[] lookup_table1 = new double[(int) Math.pow(15, 6)];
+		double[] lookup_table2 = new double[(int) Math.pow(15, 6)];
+		double[] lookup_table3 = new double[(int) Math.pow(15, 6)];
+
+		double[] lookup_table4 = new double[(int) Math.pow(15, 6)];
+
+		ArrayList<Pair<Integer, Integer>> t1_cells = new ArrayList<>();
+		t1_cells.add(new Pair<>(0, 0));
+		t1_cells.add(new Pair<>(1, 0));
+		t1_cells.add(new Pair<>(1, 1));
+		t1_cells.add(new Pair<>(0, 1));
+		t1_cells.add(new Pair<>(0, 2));
+		t1_cells.add(new Pair<>(0, 3));
+		Tuple t1 = new Tuple(lookup_table1, t1_cells);
+
+		ArrayList<Pair<Integer, Integer>> t2_cells = new ArrayList<>();
+		t2_cells.add(new Pair<>(1, 0));
+		t2_cells.add(new Pair<>(2, 0));
+		t2_cells.add(new Pair<>(2, 1));
+		t2_cells.add(new Pair<>(1, 1));
+		t2_cells.add(new Pair<>(1, 2));
+		t2_cells.add(new Pair<>(1, 3));
+		Tuple t2 = new Tuple(lookup_table2, t2_cells);
+
+		ArrayList<Pair<Integer, Integer>> t3_cells = new ArrayList<>();
+		t3_cells.add(new Pair<>(0, 0));
+		t3_cells.add(new Pair<>(0, 1));
+		t3_cells.add(new Pair<>(0, 2));
+		t3_cells.add(new Pair<>(1, 2));
+		t3_cells.add(new Pair<>(1, 1));
+		t3_cells.add(new Pair<>(1, 0));
+		Tuple t3 = new Tuple(lookup_table3, t3_cells);
+
+		ArrayList<Pair<Integer, Integer>> t4_cells = new ArrayList<>();
+		t4_cells.add(new Pair<>(1, 0));
+		t4_cells.add(new Pair<>(1, 1));
+		t4_cells.add(new Pair<>(1, 2));
+		t4_cells.add(new Pair<>(2, 2));
+		t4_cells.add(new Pair<>(2, 1));
+		t4_cells.add(new Pair<>(2, 0));
+		Tuple t4 = new Tuple(lookup_table4, t4_cells);
+
+		tuples.add(t1);
+		tuples.add(t2);
+		tuples.add(t3);
+		tuples.add(t4);
+
+		this.tuples = tuples;
+	}
+
+	/**
+	 * 
+	 * Evaluate the given state-action pair 
 	 * @param current_state
 	 * @param current_action
 	 * @param update - tuples keep both V(s') and V(s'_next) if update is true then they are updated. If you only want to evaluate the state
@@ -151,7 +223,7 @@ public class GeneticAgent implements Agent, Runnable {
 		int reward = afterState.makeMove(current_action);
 
 		//Need to obtain sum of all tuple weights from the table
-		//pdate = true updates the previous afterstate estimate with the current one
+		//pdate=true updates the previous afterstate estimate with the current one
 		for (int i = 0; i < 4; i++) {
 			for (Tuple t :tuples) {
 				tupleWeights += t.evaluateBoard(afterState.getBoard(), update);
@@ -175,7 +247,7 @@ public class GeneticAgent implements Agent, Runnable {
 		double tupleWeights = 0;
 
 		//Need to obtain sum of all tuple weights from the table
-		//pdate = true updates the previous afterstate estimate with the current one
+		//pdate=true updates the previous afterstate estimate with the current one
 		for (int i = 0; i < 4; i++) {
 			for (Tuple t :tuples) {
 				tupleWeights += t.evaluateBoard(current_state.getBoard(), update);
@@ -193,6 +265,7 @@ public class GeneticAgent implements Agent, Runnable {
 	 * @return
 	 */
 	public Action2048 argmax(Board current_state) {
+
 		//Turn board into state. From the state s calculate the action that result in the best s' based on the table values
 		State2048 state = new State2048(current_state.get());
 		ArrayList<Action2048> possible_actions = state.getPossibleMoves();
@@ -229,8 +302,10 @@ public class GeneticAgent implements Agent, Runnable {
 	 * @param state - starting state
 	 * @param learning_rate
 	 */
-	public int learnFromState(State2048 state, double learning_rate) {
-		while (!state.isTerminal()) {
+	public void learnFromState(State2048 state, double learning_rate) {
+		
+		while (!state.isTerminal()) {   
+    		int reward = state.makeMove(argmax(new Board(state.getBoard())));
     		double currentActionValue = evaluateAfterstate(state, true);
     		state.addRandomTile(random);
 
@@ -243,8 +318,6 @@ public class GeneticAgent implements Agent, Runnable {
     			}
     		}
     	}
-
-		return 1;
 	}
 
 	/**
@@ -252,120 +325,135 @@ public class GeneticAgent implements Agent, Runnable {
 	 * @param numGames
 	 * @param learningRate
 	 */
-	 public void learnAgent(int numGames,double learningRate,boolean verbal) {
- 		RandomDataGenerator random = new RandomDataGenerator(new MersenneTwister());
- 		//RandomDataGenerator random = new RandomDataGenerator(new MersenneTwister(random_seed));
- 		long startTime = System.nanoTime();
- 		int score;
+	public void learnAgent(int numGames, double learningRate) {
+		RandomDataGenerator random = new RandomDataGenerator(new MersenneTwister());
+		//RandomDataGenerator random = new RandomDataGenerator(new MersenneTwister(random_seed));
 
- 	    for (int i = 0; i < numGames; i++) {
- 	    	Game2048 game = new Game2048();
- 	    	State2048 state = game.sampleInitialStateDistribution(random);
- 	    	int lastStateMax = 0;
- 	    	score = 0;
+	    for (int i = 0; i < numGames; i++) {
+	    	Game2048 game = new Game2048();
+	    	State2048 state = game.sampleInitialStateDistribution(random);
+	    	int lastStateMax = 0;
 
- 	    	while (!game.isTerminalState(state)) {
- 	    		//checks the maximum tile reached for this game and if it is in the list starts to learn from that state.
- 	    		//this happens only once for each value in the list.
- 	    		int max = state.getMaxTile();
+	    	while (!game.isTerminalState(state)) {
+	    		//checks the maximum tile reached for this game and if it is in the list starts to learn from that state.
+	    		//this happens only once for each value in the list.
+	    		int max = state.getMaxTile();
 
- 	    		for (int j = 0; j < stateMax.length; j++) {
- 	    			if(stateMax[j] == max && stateMax[j] > lastStateMax) {
- 	    				for (int numberOfRepetitions = 0; numberOfRepetitions < stateIterations[j]; numberOfRepetitions++) {
- 	    					i += learnFromState(new State2048(state), learningRate);
- 	    					lastStateMax = stateMax[j];
- 	    				}
- 	    				break;
- 	    			}
- 	    		}
+	    		for (int j = 0; j < stateMax.length; j++) {
+	    			if (stateMax[j] == max && stateMax[j] > lastStateMax) {
+	    				for (int numberOfRepetitions = 0; numberOfRepetitions < stateIterations[j]; numberOfRepetitions++) {
+	    					learnFromState(new State2048(state), learningRate);
+	    					lastStateMax = stateMax[j];
+	    				}
 
- 	    		int reward = state.makeMove(argmax(new Board(state.getBoard())));
- 	    		double currentActionValue = evaluateAfterstate(state, true);
- 	    		state.addRandomTile(random);
- 	    		score += reward;
+	    				break;
+	    			}
+	    		}
 
- 	    		if (!state.isTerminal()) {
- 	    			Pair<Double, Double> nextActionValue = evaluate(state, argmax(new Board(state.getBoard())), false);
- 	    			double error = nextActionValue.second() + nextActionValue.first() - currentActionValue;
- 	    			for (Tuple t : tuples) {
- 	    				//t.update(error*learning_rate/g.tuples.size());
- 	    				t.update(error*learningRate);
- 	    			}
- 	    		}
- 	    	}
+	    		int reward = state.makeMove(argmax(new Board(state.getBoard())));
+	    		double currentActionValue = evaluateAfterstate(state, true);
+	    		state.addRandomTile(random);
+	    		
+	    		if (!state.isTerminal()) {
+	    			Pair<Double, Double> nextActionValue = evaluate(state, argmax(new Board(state.getBoard())), false);
+	    			double error = nextActionValue.second() + nextActionValue.first() - currentActionValue;
+	    			for (Tuple t : tuples) {
+	    				//t.update(error*learning_rate/g.tuples.size());
+	    				t.update(error * learningRate);
+	    			}
+	    		}
+	    	}
+	    }
 
- 	    	if (verbal) {
- 	    		printWriter.println(String.format("%d\t%d", i + 1, score));
- 				printWriter.flush();
-
- 				if((i + 1) % 100 == 0 || (i + 1) == numGames) {
- 					Date date = new Date();
- 					System.out.println(String.format("%s: %3d Games Played, Score: %4d", formatter.format(date), i+1, score));
- 				}
-
- 	    	}
- 	    }
- 		System.out.println("took " + (System.nanoTime() - startTime) / 1_000_000_000 + " seconds for " + numGames + " games");
- 	}
+	}
 
 	/**
 	 *
+	 * @param args
+	 * @throws IOException
 	 */
-	public void storeTuples() {
+	public static void main(String[] args) throws IOException {
+		double learning_rate = 0.0025; // to have a better 'immediate' result use 0.01 but seems like in long term 0.0025 is better
+		int action_time_limit_ms = 1000;
+		int numGames = 1000;
+		int random_seed = 123;
+		RandomDataGenerator random = new RandomDataGenerator(new MersenneTwister());
+		//RandomDataGenerator random = new RandomDataGenerator(new MersenneTwister(random_seed));
+
+		GeneticAgent g = new GeneticAgent(random);
+		long startTime = System.nanoTime();
+		// FileWriter for score logging
+	    FileWriter fileWriter = new FileWriter("run.tsv");
+	    PrintWriter printWriter = new PrintWriter(fileWriter);
+	    
+	    for (int i = 0; i < numGames; i++) {
+
+	    	Game2048 game = new Game2048();
+	    	State2048 state = game.sampleInitialStateDistribution(g.random);
+	    	int score = 0;
+	    	int lastStateMax = 0;
+
+	    	while (!game.isTerminalState(state)) {
+	    		//checks the maximum tile reached for this game and if it is in the list starts to learn from that state.
+	    		//this happens only once for each value in the list.
+	    		int max = state.getMaxTile();
+	    		for (int j = 0; j < stateMax.length; j++) {
+	    			if (stateMax[j] == max && stateMax[j] > lastStateMax) {
+	    				System.out.println("learning from state");
+	    				state.printHumanReadable();
+
+	    				for (int numberOfRepetitions = 0; numberOfRepetitions<stateIterations[j]; numberOfRepetitions++) {
+	    					g.learnFromState(new State2048(state), learning_rate);
+	    					lastStateMax = stateMax[j];
+	    				}
+
+	    				break;
+	    			}
+	    		}
+	    		
+	    		int reward = state.makeMove(g.argmax(new Board(state.getBoard())));
+
+	    		score += reward;
+	    		double currentActionValue = g.evaluateAfterstate(state, true);
+	    		state.addRandomTile(g.random);
+	    		
+	    		if (!state.isTerminal()) {
+	    			Pair<Double, Double> nextActionValue = g.evaluate(state, g.argmax(new Board(state.getBoard())), false);
+	    			double error = nextActionValue.second() + nextActionValue.first() - currentActionValue;
+	    			for (Tuple t : g.tuples) {
+	    				//t.update(error*learning_rate/g.tuples.size());
+	    				t.update(error * learning_rate);
+	    			}
+	    		}
+	    	}
+	    	
+			printWriter.println(String.format("%d\t%d", i + 1, score));
+			printWriter.flush();
+
+			if ((i + 1) % 100 == 0 || (i + 1) == numGames) {
+				Date date = new Date();
+				System.out.println(String.format("%s: %3d Games Played, Score: %4d", formatter.format(date), i + 1, score));
+			}
+	    }
+
+		printWriter.close();
+		System.out.println("took " + (System.nanoTime() - startTime) / 1_000_000_000 + " seconds for " + numGames + " games");
+
 		try {
- 			FileOutputStream fileOutputStream;
- 			fileOutputStream = new FileOutputStream("tuples"+String.valueOf(this.myId)+".bin");
- 			ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
- 			objectOutputStream.writeObject(tuples);
- 			objectOutputStream.flush();
- 			objectOutputStream.close();
- 			//System.out.println("Stored: tuples" + this.myId +".bin");
- 			//System.out.println("Finished writing files" + myId);
- 		} catch (IOException e) {
- 			e.printStackTrace();
- 		}
+			FileOutputStream fileOutputStream;
+			fileOutputStream = new FileOutputStream("tuples.bin");
+			ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
+			objectOutputStream.writeObject(g.tuples);
+			objectOutputStream.flush();
+			objectOutputStream.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}	
 	}
 
- 	/**
- 	 *
- 	 * @param args
- 	 * @throws IOException
- 	 */
- 	public static void main(String[] args) throws IOException {
- 		fileWriter = new FileWriter("run.tsv");
- 		printWriter = new PrintWriter(fileWriter);
- 		double learning_rate = 0.0025; // to have a better 'immediate' result use 0.01 but seems like in long term 0.0025 is better
- 		int action_time_limit_ms = 1000;
- 		int numGames = 1000;
- 		int random_seed = 123;
- 		RandomDataGenerator random = new RandomDataGenerator(new MersenneTwister());
- 		//RandomDataGenerator random = new RandomDataGenerator(new MersenneTwister(random_seed));
- 		ArrayList<GeneticAgent> agents = new ArrayList<>();
- 		for (int i = 0; i < 11; i++) {
- 			ArrayList<Tuple> tuples = new ArrayList<>();
- 			
- 			for (int j = 0; j < 4; j++) {
- 	 			int randomLength = random.nextInt(2, 6);
- 	 			double [] lut = new double[(int)Math.pow(15, randomLength)];
- 	 			tuples.add(new Tuple(lut, new TupleGenotype(randomLength).buildTupleCells()));
- 			}
- 			
- 			agents.add(new GeneticAgent(tuples));
- 		}
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+	}
+}
 
- 		for (GeneticAgent g : agents) {
- 			new Thread(g).start();
- 		}
- 		// FileWriter for score logging
-
- 		//g.learnAgent(numGames,learning_rate,true);
- 		printWriter.close();
- 	}
-
- 	@Override
- 	public void run() {
- 		learnAgent(500,0.0025,false);
- 		storeTuples();
- 		MultipleAgentLearnEvaluation.report(this.myId);
- 	}
- }
