@@ -4,59 +4,29 @@ import put.ci.cevo.util.Pair;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Random;
 
-import org.apache.commons.math3.random.RandomDataGenerator;
-
-public class TupleGenotype implements Serializable{
-    private Pair<Integer, Integer> startPosition;
-    private int startDirection;
-    private int[] turns;
-
-    private final int chrom_amount = 3;
-    private final int[] board_size = {4, 4};
-
-    // Increasing index by 1 is a turn to left
-    private final Pair<Integer, Integer> UP = new Pair<>(0, -1);
-    private final Pair<Integer, Integer> LEFT = new Pair<>(-1, 0);
-    private final Pair<Integer, Integer> DOWN = new Pair<>(0, 1);
-    private final Pair<Integer, Integer> RIGHT = new Pair<>(1, 0);
-    private final ArrayList<Pair<Integer, Integer>> directions = new ArrayList<>();
-
-    private final int TURN_RIGHT = -1;
-    private final int TURN_STRAIGHT = 0;
-    private final int TURN_LEFT = 1;
-    private final int[] turnDirections = {TURN_RIGHT, TURN_STRAIGHT, TURN_LEFT};
-
-    /**
-     * Private constructor to add directions
-     */
-    private TupleGenotype()  {
-        this.directions.add(UP);
-        this.directions.add(LEFT);
-        this.directions.add(DOWN);
-        this.directions.add(RIGHT);
-    }
+public class TupleGenotype implements Serializable {
+    public Pair<Integer, Integer> startPosition;
+    public int startDirection;
+    public int[] turns;
 
     /**
      * Create a new random tuple genotype of given size
      * @param tupleSize - Size of the tuple
      */
-    TupleGenotype(int tupleSize)  {
-        this();
-
+    TupleGenotype(int tupleSize) {
         Random rand = new Random();
 
         this.startPosition = new Pair<>(rand.nextInt(3), rand.nextInt(3));
-        this.startDirection = rand.nextInt(directions.size());
+        this.startDirection = rand.nextInt(4);
         this.turns = new int[tupleSize - 1];
 
         boolean valid;
 
         do {
             for (int i = 0; i < tupleSize - 1; i++) {
-                this.turns[i] = rand.nextInt(turnDirections.length) - 1;
+                this.turns[i] = rand.nextInt(3) - 1;
             }
 
             valid = isTupleValid(this.buildTupleCells());
@@ -70,8 +40,6 @@ public class TupleGenotype implements Serializable{
      * @param turns - List of turns to make
      */
     TupleGenotype(Pair<Integer, Integer> startPosition, int startDirection, int[] turns) {
-        this();
-
         this.startPosition = startPosition;
         this.startDirection = startDirection;
         this.turns = turns;
@@ -82,77 +50,66 @@ public class TupleGenotype implements Serializable{
      * @param parent1 - Parent 1
      * @param parent2 - Parent 2
      */
-    private TupleGenotype(TupleGenotype parent1, TupleGenotype parent2) throws IllegalArgumentException {
-        this();
- 
-        Random rand = new Random();
-        TupleGenotype[] parents = {parent1, parent2};
+    TupleGenotype(TupleGenotype parent1, TupleGenotype parent2) throws IllegalArgumentException {
+        if (parent1.turns.length != parent2.turns.length) {
+            throw new IllegalArgumentException();
+        }
 
-        int choose = rand.nextInt(1);
-        this.startPosition = parents[choose].startPosition;
+        boolean isValid = false;
 
-        choose = rand.nextInt(1);
-        this.startDirection = parents[choose].startDirection;
-           
-        boolean valid = false;
-        int cTurn;
-        while (!valid) {
-        	this.turns = new int[parents[choose].turns.length];
+        while (!isValid) {
+            Random rand = new Random();
+            TupleGenotype[] parents = {parent1, parent2};
+
+            int choose = rand.nextInt(1);
+            this.startPosition = parents[choose].startPosition;
+
+            choose = rand.nextInt(1);
+            this.startDirection = parents[choose].startDirection;
+
+            // Turns
+            this.turns = new int[parent1.turns.length];
             for (int i = 0; i < this.turns.length; i++) {
                 choose = rand.nextInt(1);
-                cTurn = rand.nextInt(parents[choose].turns.length);
-                this.turns[i] = parents[choose].turns[cTurn];
+                this.turns[i] = parents[choose].turns[i];
             }
-            
-            valid = this.isTupleValid(this.buildTupleCells());
+            isValid = this.isTupleValid(this.buildTupleCells());
         }
-        
     }
 
     /**
      * Mutate a tuple
      */
-    private void mutate() {
-        Random rand = new Random();
+    void mutate() {
 
-        boolean valid;
+        boolean isValid = false;
 
-        do {
-            int mutation = rand.nextInt(this.chrom_amount);
+        while (!isValid) {
+
+            Random rand = new Random();
+
+            int mutation = rand.nextInt(3);
+
             switch (mutation) {
+
                 case 0:
                     // Start Position
                     this.startPosition = new Pair<>(rand.nextInt(3), rand.nextInt(3));
-                    break;
+                    return;
 
                 case 1:
                     // Start Direction
-                    this.startDirection = rand.nextInt(this.directions.size());
-                    break;
+                    this.startDirection = rand.nextInt(4);
+
+                    return;
 
                 case 2:
                     // Turns
-                    this.turns[rand.nextInt(this.turns.length - 1)] = rand.nextInt(this.turnDirections.length) - 1;
-                    break;
+                    this.turns[rand.nextInt(3)] = rand.nextInt(3) - 1;
+                    return;
             }
-
-            valid = isTupleValid(this.buildTupleCells());
-        } while (!valid);
-    }
-
-    /**
-     * Print the tuple info
-     */
-    void print() {
-        System.out.println("Start Position: " + this.startPosition);
-        System.out.println("Start direction: " + this.startDirection);
-        System.out.println(this.turnDirections.length);
-
-        for (int i = 0; i < this.turns.length; i++) {
-        	System.out.println("Turn" + i + " : " + this.turnDirections[i]);
-       }
-
-        System.out.println();
+            isValid = isTupleValid(this.buildTupleCells());
+        }
     }
 
     /**
@@ -160,10 +117,10 @@ public class TupleGenotype implements Serializable{
      * @param tupleCells
      * @return
      */
-    private boolean isTupleValid(ArrayList<Pair<Integer, Integer>> tupleCells) {
+    public boolean isTupleValid(ArrayList<Pair<Integer, Integer>> tupleCells) {
         // Check it doesn't go back on itself
         for (Pair<Integer, Integer> cell : tupleCells) {
-            if (cell.first() < 0 || cell.first() >= 4 || cell.second() < 0 || cell.second() >= 4) {
+            if (cell.first() < 0 || cell.first() > 3 || cell.second() < 0 || cell.second() > 3) {
                 return false;
             }
         }
@@ -201,94 +158,12 @@ public class TupleGenotype implements Serializable{
         tupleCells.add(currentPosition);
 
         for (int turn = 0; turn < this.turns.length; turn++) {
-            currentDirection = ((currentDirection + this.turns[turn]) + 4) % 4;
-            currentPosition = new Pair<>(currentPosition.first() + directions.get(currentDirection).first(), currentPosition.second() + directions.get(currentDirection).second());
+            currentDirection = (currentDirection + this.turns[turn] + 4) % 4;
+
+            currentPosition = new Pair<>(currentPosition.first() + EnumAbsoluteDirections.getDirectionData(currentDirection).xDiff, currentPosition.second() + EnumAbsoluteDirections.getDirectionData(currentDirection).yDiff);
             tupleCells.add(currentPosition);
         }
 
         return tupleCells;
-    }
-
-    /**
-     *
-     * @param population
-     * @return
-     */
-    private static Tuple tournament(ArrayList<Tuple> population){
-    	int top_cat = 5;
-    	ArrayList<Tuple> tournamentIndividuals = new ArrayList<>();
-
-    	Collections.shuffle(population);
-
-    	for (int p = 0; p < top_cat; p++) {
-    	    tournamentIndividuals.add(population.get(p));
-    	}
-
-    	return Tuple.sort(tournamentIndividuals).get(0);
-    }
-
-    /**
-     *
-     * @param population
-     * @return
-     */
-    static ArrayList<Tuple> new_generation(ArrayList<Tuple> population){
-    	double mut_prob = 0.3;
-    	int to_delete = 10;
-    	TupleGenotype temp_child;
-    	double[] lookup_table1;
-    	Tuple child_tuple;
-    	
-    	//System.out.println(population.size());
-    	ArrayList<Tuple> sortedPopulation = Tuple.sort(population);
-
-    	for (int i = 0; i < to_delete; i++) {
-    		sortedPopulation.remove(i);
-    	}
-
-    	//System.out.println(population.size());
-    	for (int i = 0; i < to_delete; i++) {
-            lookup_table1 = new double[(int) Math.pow(15, 6)];
-
-            if (Math.random() < mut_prob) { // Mutation
-                TupleGenotype parent = tournament(sortedPopulation).genotype;
-                temp_child = new TupleGenotype(parent.startPosition, parent.startDirection, parent.turns);
-                temp_child.mutate();
-            } else { //Crossover
-                temp_child = new TupleGenotype(tournament(sortedPopulation).genotype, tournament(sortedPopulation).genotype);
-            }
-
-            child_tuple = new Tuple(lookup_table1, temp_child.buildTupleCells());
-            child_tuple.setGenoType(temp_child);
-            sortedPopulation.add(child_tuple);
-        }
-
-    	return sortedPopulation;
-    }
-
-    /**
-     *
-     * @param population
-     * @param random
-     */
-    public static void shuffle(ArrayList<Tuple> population, RandomDataGenerator random, ArrayList<GeneticAgent> agentList) {
-
-    	for (int i = 0; i < MultipleAgentLearnEvaluation.NUMBER_OF_AGENTS; i++) {
- 			ArrayList<Tuple> tuples = new ArrayList<>();
- 			for (int j = 0; j < 4; j++) {
- 				int tupleIndex = 0;
-
- 				if (population.size() > 1) {
- 					tupleIndex = random.nextInt(0, population.size() - 1);
- 				}
-
- 	 			tuples.add(population.get(tupleIndex));
- 	 			population.remove(tupleIndex);
- 			}
-
- 			GeneticAgent g = new GeneticAgent(tuples, i);
- 			g.storeTuples();
- 			agentList.add(g);
- 		}
     }
 }

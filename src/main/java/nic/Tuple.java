@@ -2,97 +2,37 @@ package nic;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
-
 import put.ci.cevo.util.Pair;
 
 
 public class Tuple implements Serializable {
 	private static final long serialVersionUID = -94781376176241568L;
 	private double[] tupleLookupTable;
-	private final ArrayList<Pair<Integer, Integer>> tupleCells;
-	private final ArrayList<Integer> tupleKeys;
+	private ArrayList<Pair<Integer, Integer>> tupleCells;
+	private ArrayList<Integer> tupleKeys; 
 	private double current_value;
-	private final ArrayList<Double> scores = new ArrayList<>();
-	public TupleGenotype genotype;
+	private TupleGenotype genotype;
 
 	/**
-	 *
-	 * @param lookup
-	 * @param tuple_cells
+	 * Create new tuple
+	 * @param lookup - Lookup table to use
+	 * @param genotype - Genotype of tuple
 	 */
-	Tuple(double[] lookup, ArrayList<Pair<Integer, Integer>> tuple_cells) {
-		this.tupleLookupTable =lookup;
-		this.tupleCells = tuple_cells;
+	Tuple(double[] lookup, TupleGenotype genotype) {
+		this.tupleLookupTable = lookup;
+		this.genotype = genotype;
+		this.tupleCells = genotype.buildTupleCells();
 
 		tupleKeys = new ArrayList<>();
 		current_value = 0;
 	}
 
 	/**
-	 *
-	 * @param tuples
-	 * @return
+	 * Find the key for the given board state
+	 * @param boardState - Board state to evaluate
+	 * @return - Key were the quality value is stored
 	 */
-	public static ArrayList<Tuple> sort(ArrayList<Tuple> tuples){
-		//Ascending order sort
-		ArrayList<Tuple> sorted_tuples = new ArrayList<>();
-		ArrayList<Double> values = new ArrayList<>();
-
-		for (int i = 0; i < tuples.size(); i++) {
-			values.add(tuples.get(i).evaluateScores());
-		}
-
-		ArrayList<Double> sorted_values = new ArrayList<>(values);
-		Collections.sort(sorted_values);
-		for (int i = 0; i < values.size(); i++) {
-			sorted_tuples.add(tuples.get(values.indexOf(sorted_values.get(i))));
-		}
-		
-		return sorted_tuples;
-	}
-
-	/**
-	 *
-	 * @param g
-	 */
-	public void setGenoType(TupleGenotype g) {
-		this.genotype = g;
-	}
-
-	/**
-	 *
-	 * @param score
-	 */
-	public void addScore(double score) {
-		scores.add(score);
-	}
-
-	/**
-	 *
-	 */
-	public void clearScores() {
-		this.scores.clear();
-	}
-
-	/**
-	 *
-	 * @return
-	 */
-	private double evaluateScores() {
-		double sum = 0;
-		for (Double score : scores) {
-			sum += score;
-		}
-		return (sum /= scores.size());
-	}
-
-	/**
-	 *
-	 * @param boardState
-	 * @return
-	 */
-	private int findKey(int[][] boardState) {
+	public int findKey(int[][] boardState) {
 		int key = boardState[tupleCells.get(0).first()][tupleCells.get(0).second()];
 		int base15 = 15;
 
@@ -107,9 +47,9 @@ public class Tuple implements Serializable {
 	/**
 	 * Each tuple keeps its current key used for last action evaluation.
      * use update=true only if you are going to update the value for that action
-	 * @param afterstate -
+	 * @param afterstate - board state
 	 * @param update - whether to keep the value for later update
-	 * @return
+	 * @return - quality estimation of board
 	 */
 	public double evaluateBoard(int[][] afterstate, boolean update) {
 		int key = findKey(afterstate);
@@ -124,25 +64,10 @@ public class Tuple implements Serializable {
 	}
 
 	/**
-	 *
-	 * @return
-	 */
-	public double[] getLookupTable(){
-		return this.tupleLookupTable;
-	}
-
-	/**
-	 *
-	 */
-	public void refreshLookupTable() {
-		this.tupleLookupTable= new double[(int)Math.pow(15,this.tupleCells.size())];
-	}
-
-	/**
-	 *
-	 * @param afterstate
-	 * @param update
-	 * @return
+	 * Evaluate the board taking into account tuple reflection
+	 * @param afterstate - board state
+	 * @param update - whether to keep the value for later update
+	 * @return - quality estimation of board
 	 */
 	public double evaluateBoardReflection(int[][] afterstate, boolean update) {
 		int key = afterstate[(-tupleCells.get(0).first() + 3) % 4][tupleCells.get(0).second()];
@@ -175,35 +100,5 @@ public class Tuple implements Serializable {
 
 			tupleKeys.clear();
 		}
-	}
-
-	/**
-	 *
-	 * @return
-	 */
-	public double getTupleValue() {
-		return current_value;
-	}
-
-	/**
-	 * this method is not used yet but it was meant for comparing tuple shapes to possibly share the lookup table between tuples. Should be useful in tuple evaluation.
-	 * @param another_tuple
-	 * @return
-	 */
-	public boolean compareShapes(ArrayList<Pair<Integer, Integer>> another_tuple) {
-
-		if (another_tuple.size() != tupleCells.size()) {
-			return false;
-		}
-
-		Pair <Integer, Integer> difference;
-		difference = new Pair<>(another_tuple.get(0).first() - tupleCells.get(0).first(), another_tuple.get(0).second() - tupleCells.get(0).second());
-		for (int i = 1; i < another_tuple.size(); i++) {
-			if (difference.first() != another_tuple.get(i).first() - tupleCells.get(i).first() || difference.second() != another_tuple.get(i).second() - tupleCells.get(i).second()) {
-				return false;
-			}
-		}
-
-		return true;
 	}
 }
