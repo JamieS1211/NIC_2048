@@ -24,7 +24,23 @@ public class AgentEvaluation {
 		MultipleGamesResult result = new Game(ACTION_TIME_LIMIT).playMultiple(AGENT, REPEATS, random);
 		System.out.println(result.toCvsRow());
 	}
+	public static double evaluateAgent(GeneticAgent g){
+		int action_time_limit_ms = 1000;
+		int num_games = 1000;
 
+		final Supplier<Agent> AGENT = new Supplier<Agent>() {
+			@Override
+			public Agent get() {
+				return g;
+			}
+		};
+		final int REPEATS = num_games;
+		final Duration ACTION_TIME_LIMIT = Duration.ofNanos(action_time_limit_ms * 1000 * 1000);
+
+		RandomDataGenerator random = new RandomDataGenerator(new MersenneTwister());
+		MultipleGamesResult result = new Game(ACTION_TIME_LIMIT).playMultiple(AGENT, REPEATS, random);
+		return result.getScore().getMean();
+	}
 	private static Supplier<Agent> createAgentFactoryByReflection() {
 		GeneticAgent agent = new GeneticAgent();
 		return () -> agent;

@@ -3,12 +3,12 @@ package nic;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class Test {
+public class RunMultithreadedFullTraining {
 
     // Sort population
     public static ArrayList<GenoTypeScore> sortGenoTypeScoreList (ArrayList<GenoTypeScore> list) {
 
-        ArrayList<Integer>  scores = new ArrayList<>();
+        ArrayList<Double>  scores = new ArrayList<>();
         ArrayList<GenoTypeScore> newList = new ArrayList<>();
         for (int i = 0; i < list.size(); i++){
             GenoTypeScore item = list.get(i);
@@ -18,7 +18,7 @@ public class Test {
                 scores.add(item.score);
             }
         }
-        ArrayList<Integer> sorted_scores = new ArrayList<>(scores);
+        ArrayList<Double> sorted_scores = new ArrayList<>(scores);
 
         for (int j = 0; j < sorted_scores.size(); j++){
             newList.add(list.get(scores.indexOf(sorted_scores.get(j))));
@@ -66,7 +66,7 @@ public class Test {
 
                 // Generate X new from Y remaining
                 for (int i = 0; i < discardedIndividualsDuringBreeding; i++) {
-                    population.add(new GenoTypeScore(tupleID, 2, 6));
+                    population.add(new GenoTypeScore(tupleID, 2, 6)); // TODO - Breeding
                 }
             }
 
@@ -91,20 +91,20 @@ public class Test {
 
                 while (!threads[thread].isDone()) {
                     Thread.sleep(1000);
-                    //TODO - Thread can't yet run the agent
                     //Waiting for this thread to finish
                 }
 
                 // Get scores and update our genotype scores with thease values
                 for (int tuple = 0; tuple < tuplesPerAgent; tuple++) {
                     population.get((thread * 4) + tuple).incrementRounds(1);
-                    population.get((thread * 4) + tuple).incrementScore(1); // TODO - Real value here
+                    population.get((thread * 4) + tuple).incrementScore(threads[thread].score);
                 }
 
                 System.out.println("End waiting");
-
             }
         }
+
+        System.out.println("Building agent with best tuples");
 
         population = sortGenoTypeScoreList(population);
 
@@ -113,6 +113,10 @@ public class Test {
         GeneticAgent bestTupleAgent = new GeneticAgent(bestTupleGenotypes);
 
         // Train final agent for X
-        // TODO - Train best tuple agent and save results
+        for (int i = 0; i < 100; i++) {
+            bestTupleAgent.learnAgent(50000, 0.0025);
+            bestTupleAgent.storeTuples();
+            //TODO - Save agent at this stage
+        }
     }
 }

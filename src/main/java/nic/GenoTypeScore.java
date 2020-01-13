@@ -7,8 +7,8 @@ public class GenoTypeScore {
 
     public int id;
     public TupleGenotype genotype;
-    public int score;
-    int roundsPlayed;
+    public double score;
+    public int roundsPlayed;
 
     /**
      *
@@ -29,7 +29,7 @@ public class GenoTypeScore {
      * Increment the score of this genotype
      * @param score - Amount to increment the score
      */
-    void incrementScore(int score){
+    void incrementScore(double score){
         this.score += score;
     }
 

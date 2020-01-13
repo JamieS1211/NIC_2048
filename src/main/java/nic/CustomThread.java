@@ -1,5 +1,7 @@
 package nic;
 
+import put.game2048.Agent;
+
 import java.io.IOException;
 
 public class CustomThread implements Runnable {
@@ -7,6 +9,7 @@ public class CustomThread implements Runnable {
     GenoTypeScore[] genoTypeScores;
 
     boolean done = false;
+    double score = 0;
 
     CustomThread(GenoTypeScore[] genoTypeScores) {
         this.thread = new Thread(this);
@@ -26,8 +29,9 @@ public class CustomThread implements Runnable {
 
         agent.learnAgent(500, 0.0025);
 
-        // TODO - Test this agent and find its score
-
+        System.out.println("Test123");
+        this.score = AgentEvaluation.evaluateAgent(agent);
+        System.out.println("evaluated score: " + score);
         this.done = true;
     }
 

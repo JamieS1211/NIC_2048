@@ -244,7 +244,20 @@ public class GeneticAgent implements Agent {
 	    }
 
 	}
+public void storeTuples(){
 
+	try {
+		FileOutputStream fileOutputStream;
+		fileOutputStream = new FileOutputStream("tuples.bin");
+		ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
+		objectOutputStream.writeObject(tuples);
+		objectOutputStream.flush();
+		objectOutputStream.close();
+	} catch (IOException e) {
+		e.printStackTrace();
+	}
+
+}
 	/**
 	 *
 	 * @param args
@@ -313,20 +326,9 @@ public class GeneticAgent implements Agent {
 				System.out.println(String.format("%s: %3d Games Played, Score: %4d", formatter.format(date), i + 1, score));
 			}
 	    }
-
+		g.storeTuples();
 		printWriter.close();
 		System.out.println("took " + (System.nanoTime() - startTime) / 1_000_000_000 + " seconds for " + numGames + " games");
-
-		try {
-			FileOutputStream fileOutputStream;
-			fileOutputStream = new FileOutputStream("tuples.bin");
-			ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
-			objectOutputStream.writeObject(g.tuples);
-			objectOutputStream.flush();
-			objectOutputStream.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}	
 	}
 }
 
