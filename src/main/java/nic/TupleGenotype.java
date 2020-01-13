@@ -55,20 +55,25 @@ public class TupleGenotype implements Serializable {
             throw new IllegalArgumentException();
         }
 
-        Random rand = new Random();
-        TupleGenotype[] parents = {parent1, parent2};
+        boolean isValid = false;
 
-        int choose = rand.nextInt(1);
-        this.startPosition = parents[choose].startPosition;
+        while (!isValid) {
+            Random rand = new Random();
+            TupleGenotype[] parents = {parent1, parent2};
 
-        choose = rand.nextInt(1);
-        this.startDirection = parents[choose].startDirection;
+            int choose = rand.nextInt(1);
+            this.startPosition = parents[choose].startPosition;
 
-        // Turns
-        this.turns = new int[parent1.turns.length];
-        for (int i = 0; i < this.turns.length; i++) {
             choose = rand.nextInt(1);
-            this.turns[i] = parents[choose].turns[i];
+            this.startDirection = parents[choose].startDirection;
+
+            // Turns
+            this.turns = new int[parent1.turns.length];
+            for (int i = 0; i < this.turns.length; i++) {
+                choose = rand.nextInt(1);
+                this.turns[i] = parents[choose].turns[i];
+            }
+            isValid = this.isTupleValid(this.buildTupleCells());
         }
     }
 
@@ -76,30 +81,36 @@ public class TupleGenotype implements Serializable {
      * Mutate a tuple
      */
     void mutate() {
-        Random rand = new Random();
 
-        int mutation = rand.nextInt(3);
+        boolean isValid = false;
 
-        switch (mutation) {
+        while (!isValid) {
 
-            case 0:
-                // Start Position
-                this.startPosition = new Pair<>(rand.nextInt(3), rand.nextInt(3));
-                return;
+            Random rand = new Random();
 
-            case 1:
-                // Start Direction
-                this.startDirection = rand.nextInt(4);
+            int mutation = rand.nextInt(3);
 
-                return;
+            switch (mutation) {
 
-            case 2:
-                // Turns
-                this.turns[rand.nextInt(3)] = rand.nextInt(3) - 1;
-                return;
+                case 0:
+                    // Start Position
+                    this.startPosition = new Pair<>(rand.nextInt(3), rand.nextInt(3));
+                    return;
+
+                case 1:
+                    // Start Direction
+                    this.startDirection = rand.nextInt(4);
+
+                    return;
+
+                case 2:
+                    // Turns
+                    this.turns[rand.nextInt(3)] = rand.nextInt(3) - 1;
+                    return;
+            }
+            isValid = isTupleValid(this.buildTupleCells());
         }
     }
-
     /**
      * Check if tuple is valid
      * @param tupleCells

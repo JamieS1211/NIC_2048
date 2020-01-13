@@ -26,6 +26,15 @@ public class GenoTypeScore {
     }
 
     /**
+     *
+     */
+    GenoTypeScore(GenoTypeScore geno){
+        this.genotype = geno.genotype;
+        this.score = 0;
+        this.roundsPlayed = 0;
+    }
+
+    /**
      * Increment the score of this genotype
      * @param score - Amount to increment the score
      */

@@ -40,6 +40,7 @@ public class RunMultithreadedFullTraining {
         int discardedIndividualsDuringBreeding = 10;
 
         int tupleID;
+        double mutationProbability = 0.3;
 
 
         // Generate initial population
@@ -49,7 +50,7 @@ public class RunMultithreadedFullTraining {
         }
 
         for (int round = 0; round < totalRounds; round++) {
-            if (round % roundsBetweenBreeding == 0 && roundsBetweenBreeding > 0) {
+            if (round % roundsBetweenBreeding == 0 && round > 0) {
                 System.out.println("");
                 System.out.println("Breeding");
                 System.out.println("");
@@ -64,9 +65,30 @@ public class RunMultithreadedFullTraining {
                     population.remove(i);
                 }
 
-                // Generate X new from Y remaining
-                for (int i = 0; i < discardedIndividualsDuringBreeding; i++) {
-                    population.add(new GenoTypeScore(tupleID, 2, 6)); // TODO - Breeding
+                //Breeding
+                int top_cat = 5;
+                GenoTypeScore parent1;
+                GenoTypeScore parent2;
+
+                for (int p = 0; p < discardedIndividualsDuringBreeding; p++){
+                    ArrayList<GenoTypeScore> tournamentIndividuals = new ArrayList<>();
+                    Collections.shuffle(population);
+
+                    for (int t = 0; t < top_cat; t++) {
+                        tournamentIndividuals.add(population.get(t));
+                    }
+
+                    parent1 = sortGenoTypeScoreList(tournamentIndividuals).get(0);
+                    parent2 = sortGenoTypeScoreList(tournamentIndividuals).get(1);
+
+                    if (Math.random() < mutationProbability){//mutation
+                        GenoTypeScore child = new GenoTypeScore(parent1);
+                        population.add(child);
+                    } else {
+                        GenoTypeScore child = new GenoTypeScore(parent2);
+                        child.genotype = new TupleGenotype(parent1.genotype, parent2.genotype);
+                        population.add(child);
+                    }
                 }
             }
 
