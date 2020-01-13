@@ -4,6 +4,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
@@ -40,10 +41,27 @@ public class GeneticAgent implements Agent, Runnable {
 	public int myId;
 	public static int id = 0;
 
+	static ArrayList<Tuple> evaluationTuples = null;
+	
 	/**
-	 *
+	 * Default constructor used by the 
 	 */
 	public GeneticAgent() {
+		if(evaluationTuples == null) {
+			FileInputStream fileInputStream;
+			try {
+				InputStream tuplesFromJar = getClass().getResourceAsStream("/tuples.bin"); 
+				ObjectInputStream objectInputStream = new ObjectInputStream(tuplesFromJar);
+				evaluationTuples = (ArrayList<Tuple>) objectInputStream.readObject();
+				objectInputStream.close();
+			} catch (IOException | ClassNotFoundException e) {
+				makeTestTuples();
+			}
+		}
+		this.tuples = evaluationTuples;
+	}
+	
+	public GeneticAgent(boolean useOldDefaultConstructor) {
 		this.tuples = new ArrayList<Tuple>();
 		FileInputStream fileInputStream;
 
