@@ -11,7 +11,7 @@ Building
 
 The repository includes a readily built GeneticAgent.jar
 
-If you want to build it yourself, execute:
+If you want to build it yourself, refer to the following.
 
 #### Windows
 Edit the third line in build_jar.bat so that
