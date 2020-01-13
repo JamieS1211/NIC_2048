@@ -468,7 +468,7 @@ public class GeneticAgent implements Agent, Runnable {
  	}
  	@Override
  	public void run() {
- 		learnAgent(25000,0.0025,false);
+ 		learnAgent(1,0.0025,false);
  		storeTuples();
  		MultipleAgentLearnEvaluation.report(this.myId);
  	}

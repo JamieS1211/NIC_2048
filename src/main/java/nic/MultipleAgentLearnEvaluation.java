@@ -10,6 +10,7 @@ public class MultipleAgentLearnEvaluation {
 	public static ArrayList<GeneticAgent> agents = new ArrayList<>();
 	public static int id = 0 ;
 	public static int evaluations = 0 ;
+	public static int overallEvaluations =5;
 	public static final int NUMBER_OF_AGENTS =11; //Due to memory limitations
 	public static void createAgents() {
 		id=0;
@@ -46,18 +47,36 @@ public class MultipleAgentLearnEvaluation {
 		if (done.size()==NUMBER_OF_AGENTS) {
 			Thread temp = new Thread () {
 				public void run() {
-					System.out.println("I am alive");
-					agents.clear();
-					AgentEvaluation.id=0;
-					AgentEvaluation.main(new String[0]);
-					if (evaluations<5) {
-						done.clear();
-
-						createAgents();
-						startAgents();
+					if(overallEvaluations>4) {
+						System.out.println("I am alive");
+						agents.clear();
+						AgentEvaluation.id=0;
+						AgentEvaluation.main(new String[0]);
+						if (evaluations<5) {
+							done.clear();
+	
+							createAgents();
+							startAgents();
+						}
+						else {
+							evaluations=0;
+							overallEvaluations+=1;
+							done.clear();
+							ArrayList<Tuple> tuples = new ArrayList<Tuple>();
+							createAgents();
+							for(GeneticAgent g :agents) {
+								for (Tuple t :g.tuples) {
+									tuples.add(t);
+								}
+							}
+							
+							ArrayList<Tuple> newgen = TupleGenotype.new_generation(tuples);
+							TupleGenotype.shuffle(newgen, new RandomDataGenerator(new MersenneTwister()));
+							createAgents();
+						}
+	
+						evaluations+=1;
 					}
-
-					evaluations+=1;
 				}
 			};
 		
@@ -70,26 +89,25 @@ public class MultipleAgentLearnEvaluation {
  		}
 	}
 	public static void main(String[] args) {
+		//Initial Population
+		createNewAgents();
+		startAgents();
 		
-		//createNewAgents();
-		//startAgents();
-		
-		
-		
-		
+		/*
 		createAgents();
 		ArrayList<Tuple> tuples = new ArrayList<Tuple>();
 		
 		for(GeneticAgent g :agents) {
 			for (Tuple t :g.tuples) {
 				tuples.add(t);
-				//System.out.println(t.scores);
 			}
 		}
 		//System.out.println(tuples.size());
-		ArrayList<Tuple> newgen = TupleGenotype.new_generation(tuples);
-		newgen.get(newgen.size()-2).genotype.print();
 		
+		ArrayList<Tuple> newgen = TupleGenotype.new_generation(tuples);
+		//newgen.get(newgen.size()-2).genotype.print();
+		TupleGenotype.shuffle(newgen, new RandomDataGenerator(new MersenneTwister()));
+		*/
 		
 		
  	}

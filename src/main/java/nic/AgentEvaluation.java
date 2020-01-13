@@ -14,7 +14,7 @@ public class AgentEvaluation {
 	public static int id = 0 ;
 	public static void main(String[] args) {
 		int action_time_limit_ms = 1000;
-		int num_games = 1000;
+		int num_games = 1;
 		String random_seed = "33121565";
 
 		 Supplier<Agent> AGENT = createAgentFactoryByReflection();
@@ -36,7 +36,7 @@ public class AgentEvaluation {
 			System.out.println(result.toCvsRow());
 			for(Tuple t:g.tuples) {
 				t.addScore(result.getScore().getMean());
-				t.refreshLookupTable();
+				//t.refreshLookupTable();
 				allTuples.add(t);
 			}
 	 		id+=1;
@@ -53,9 +53,12 @@ public class AgentEvaluation {
  	 			allTuples.remove(tupleIndex);
  			}
  			GeneticAgent g = new GeneticAgent(tuples,i);
-
+ 			
+ 			
  			g.storeTuples();
  		}
+ 		
+ 		
  		
 	}
 

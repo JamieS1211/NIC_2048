@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
 
+import org.apache.commons.math3.random.RandomDataGenerator;
+
 public class TupleGenotype implements Serializable{
     public Pair<Integer, Integer> startPosition;
     public int startDirection;
@@ -248,17 +250,14 @@ public class TupleGenotype implements Serializable{
     	//System.out.println(population.size());
     	for (int i=0;i<to_delete;i++) {
     		lookup_table1 = new double[(int) Math.pow(15, 6)];
-    		//o= Math.random();
-    		//if (o <= mut_prob) {
-    		//	operator = 1;	
-    		//}
+    		o= Math.random();
+    		if (o <= mut_prob) {
+    			operator = 1;	
+    		}
     		
     		switch (operator) {
     		case 0:
     			parents = tournament(population, 2);
-    			//parents.get(0).genotype.print();
-    			//parents.get(1).genotype.print();
-    			//System.out.println(parents.size());
     			temp_child = new TupleGenotype(parents.get(0).genotype, parents.get(1).genotype);
     			child_tuple = new Tuple(lookup_table1,temp_child.buildTupleCells());
     			child_tuple.setGenoType(temp_child);
@@ -284,5 +283,26 @@ public class TupleGenotype implements Serializable{
     	}
     	return population;
     }
+    
+    public static void shuffle(ArrayList<Tuple> population, RandomDataGenerator random) {
+    	
+    	for(int i=0;i<MultipleAgentLearnEvaluation.NUMBER_OF_AGENTS;i++) {
+ 			ArrayList<Tuple> tuples= new ArrayList<>();
+ 			for (int j =0;j<4;j++) {
+ 				int tupleIndex=0;
+ 				if (population.size()>1) {
+ 					tupleIndex = random.nextInt(0, population.size()-1);
+ 				}
+ 	 			tuples.add(population.get(tupleIndex));
+ 	 			population.remove(tupleIndex);
+ 			}
+ 			GeneticAgent g = new GeneticAgent(tuples,i);
+ 			
+ 			
+ 			g.storeTuples();
+ 		}
+    	
+    }
+    
     
 }
