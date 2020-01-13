@@ -10,6 +10,7 @@ import java.time.Duration;
 import java.util.function.Supplier;
 
 public class AgentEvaluation {
+	// Based on built in evaluation
 	public static void main(String[] args) {
 		int action_time_limit_ms = 1000;
 		int num_games = 1000;
@@ -24,6 +25,7 @@ public class AgentEvaluation {
 		MultipleGamesResult result = new Game(ACTION_TIME_LIMIT).playMultiple(AGENT, REPEATS, random);
 		System.out.println(result.toCvsRow());
 	}
+
 	public static double evaluateAgent(GeneticAgent g){
 		int action_time_limit_ms = 1000;
 		int num_games = 1000;
@@ -41,6 +43,7 @@ public class AgentEvaluation {
 		MultipleGamesResult result = new Game(ACTION_TIME_LIMIT).playMultiple(AGENT, REPEATS, random);
 		return result.getScore().getMean();
 	}
+
 	private static Supplier<Agent> createAgentFactoryByReflection() {
 		GeneticAgent agent = new GeneticAgent();
 		return () -> agent;
