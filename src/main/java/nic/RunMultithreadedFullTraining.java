@@ -35,9 +35,9 @@ public class RunMultithreadedFullTraining {
         int tupleMinLength = 2;
         int tupleMaxLength = 6;
 
-        int totalRounds = 50;
-        int roundsBetweenBreeding = 5;
-        int discardedIndividualsDuringBreeding = 10;
+        int totalRounds = 40;
+        int roundsBetweenBreeding = 4;
+        int discardedIndividualsDuringBreeding = 20;
 
         int tupleID;
         double mutationProbability = 0.3;
@@ -136,7 +136,7 @@ public class RunMultithreadedFullTraining {
 
         // Train final agent for X
         for (int i = 0; i < 100; i++) {
-            bestTupleAgent.learnAgent(50000, 0.0025);
+            bestTupleAgent.learnAgent(2000, 0.0025);
             System.out.println("Saving");
             bestTupleAgent.storeTuples();
         }
