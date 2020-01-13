@@ -87,7 +87,7 @@ public class RunMultithreadedFullTraining {
             // For each thread await done and update scores
             for (int thread = 0; thread < threads.length; thread++) {
 
-                System.out.println("Start waiting");
+                System.out.println("Start waiting: " + round);
 
                 while (!threads[thread].isDone()) {
                     Thread.sleep(1000);
@@ -100,7 +100,7 @@ public class RunMultithreadedFullTraining {
                     population.get((thread * 4) + tuple).incrementScore(threads[thread].score);
                 }
 
-                System.out.println("End waiting");
+                System.out.println("End waiting: " + round);
             }
         }
 
@@ -115,8 +115,8 @@ public class RunMultithreadedFullTraining {
         // Train final agent for X
         for (int i = 0; i < 100; i++) {
             bestTupleAgent.learnAgent(50000, 0.0025);
+            System.out.println("Saving");
             bestTupleAgent.storeTuples();
-            //TODO - Save agent at this stage
         }
     }
 }

@@ -2,10 +2,11 @@ package nic;
 
 import put.ci.cevo.util.Pair;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class TupleGenotype {
+public class TupleGenotype implements Serializable {
     public Pair<Integer, Integer> startPosition;
     public int startDirection;
     public int[] turns;

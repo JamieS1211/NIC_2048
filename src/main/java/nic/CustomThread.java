@@ -29,9 +29,7 @@ public class CustomThread implements Runnable {
 
         agent.learnAgent(500, 0.0025);
 
-        System.out.println("Test123");
         this.score = AgentEvaluation.evaluateAgent(agent);
-        System.out.println("evaluated score: " + score);
         this.done = true;
     }
 
