@@ -13,6 +13,15 @@ The repository includes a readily built GeneticAgent.jar
 
 If you want to build it yourself, execute:
 
+#### Windows
+Edit the third line in build_jar.bat so that
+`JAVA_PATH` points to your Java Installation's `bin` directory.
+Then simply double click build_jar.bat or run from the command line:
+```batch
+> build_jar.bat
+```
+
+#### Linux
 ```bash
 > ./build_jar.sh
 ```
