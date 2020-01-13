@@ -27,14 +27,13 @@ import put.game2048.Agent;
 import put.game2048.Board;
 
 
-public class GeneticAgent implements Agent, Runnable {
+public class GeneticAgent implements Agent {
 
 	public RandomDataGenerator random = new RandomDataGenerator(new MersenneTwister(123));
 	public static Action[] ACTIONS = { Action.UP, Action.RIGHT, Action.DOWN, Action.LEFT };
 	private ArrayList<Tuple> tuples;
 	public static final int[] stateMax = {16384, 8192, 4096, 2048, 1024};
 	public static final int[] stateIterations = {25, 20, 15, 10, 5};
-	//public static final int[] stateIterations = {45, 35, 25, 15, 5};
 
 	private static final SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss");
 
@@ -42,7 +41,7 @@ public class GeneticAgent implements Agent, Runnable {
 	 *
 	 */
 	public GeneticAgent() {
-		this.tuples = new ArrayList<Tuple>();
+		this.tuples = new ArrayList<>();
 		FileInputStream fileInputStream;
 
 		try {
@@ -51,9 +50,25 @@ public class GeneticAgent implements Agent, Runnable {
 			this.tuples = (ArrayList<Tuple>) objectInputStream.readObject();
 			objectInputStream.close(); 
 		} catch (IOException | ClassNotFoundException e) {
-			//CHOOSE WHICH OF THE TUPLE SETUPS YOU WANT.
-			makeTestTuples(); // - This is the 2 6-tuples and 	2 4-tuples setup
-			//makeTestTuples2(); // - This is the 4 horisontal, 4 vertical and 9 squares setup
+			RandomDataGenerator rand = new RandomDataGenerator(new MersenneTwister());
+			for (int i = 0; i < 4; i++) {
+				int size = rand.nextInt(2, 6);
+				double[] lookup_table = new double[(int) Math.pow(15, size)];
+				this.tuples.add(new Tuple(lookup_table, new TupleGenotype(size)));
+			}
+		}
+	}
+
+	/**
+	 *
+	 * @param genotypes
+	 */
+	public GeneticAgent(TupleGenotype[] genotypes) {
+		this.tuples = new ArrayList<>();
+
+		for (TupleGenotype individual : genotypes) {
+			double[] lookup_table = new double[(int) Math.pow(15, individual.turns.length + 1)];
+			this.tuples.add(new Tuple(lookup_table, individual));
 		}
 	}
 
@@ -64,143 +79,6 @@ public class GeneticAgent implements Agent, Runnable {
 	public GeneticAgent(RandomDataGenerator random) {
 		this();
 		this.random = random;
-	}
-
-	/**
-	 * the set of vertical, horisontal and square tuples of length 4
-	 */
-	public void makeTestTuples2() {
-		System.out.println("Making test tuples");
-		ArrayList<Tuple> tuples = new ArrayList<Tuple>();
-		double[] lookup_table1 = new double[(int) Math.pow(15, 4)];
-
-		for (int i = 0; i < 4; i++) {
-			//Map<String, Double> lookup_table1 = new HashMap<String, Double>();
-
-			ArrayList<Pair<Integer, Integer>> t1_cells = new ArrayList<>();
-			t1_cells.add(new Pair<>(0, i));
-			t1_cells.add(new Pair<>(1, i));
-			t1_cells.add(new Pair<>(2, i));
-			t1_cells.add(new Pair<>(3, i));
-
-			Tuple t1 = new Tuple(lookup_table1, t1_cells);
-			tuples.add(t1);
-		}
-
-		double[] lookup_table2 = new double[(int) Math.pow(15, 4)];
-
-		for (int i = 0; i < 4; i++) {
-			//Map<String, Double> lookup_table2 = new HashMap<String, Double>();
-
-			ArrayList<Pair<Integer, Integer>> t1_cells = new ArrayList<>();
-			t1_cells.add(new Pair<>(i, 0));
-			t1_cells.add(new Pair<>(i, 1));
-			t1_cells.add(new Pair<>(i, 2));
-			t1_cells.add(new Pair<>(i, 3));
-
-			Tuple t1 = new Tuple(lookup_table2, t1_cells);
-			tuples.add(t1);
-		}
-
-		double[] lookup_table3 =  new double[(int) Math.pow(15, 4)];
-
-		for (int i = 0; i < 3; i++) {
-			for(int j = 0; j < 3; j++) {
-				//Map<String, Double> lookup_table3 = new HashMap<String, Double>();
-				ArrayList<Pair<Integer, Integer>> t1_cells = new ArrayList<>();
-				t1_cells.add(new Pair<>(i, j));
-				t1_cells.add(new Pair<>(i + 1, j));
-				t1_cells.add(new Pair<>(i + 1, j + 1));
-				t1_cells.add(new Pair<>(i, j + 1));
-
-
-				Tuple t1 = new Tuple(lookup_table3, t1_cells);
-				tuples.add(t1);
-			}
-		}
-
-		this.tuples = tuples;
-	}
-
-	/**
-	 * Set of 2 rectangular tuples of length 6 and 2 tuples of length 4 
-	 */
-	public void makeTestTuples() {
-		System.out.println("Making test tuples");
-
-		ArrayList<Tuple> tuples = new ArrayList<Tuple>();
-		double[] lookup_table1 = new double[(int) Math.pow(15, 6)];
-		double[] lookup_table2 = new double[(int) Math.pow(15, 6)];
-		double[] lookup_table3 = new double[(int) Math.pow(15, 4)];
-		double[] lookup_table4 = new double[(int) Math.pow(15, 4)];
-
-		TupleGenotype gt1 = new TupleGenotype(new Pair(0, 0), 1, new int[] {1, 1, 0, 1, 1});
-		TupleGenotype gt2 = new TupleGenotype(new Pair(0, 1), 1, new int[] {1, 1, 0, 1, 1});
-		TupleGenotype gt3 = new TupleGenotype(new Pair(0, 2), 3, new int[] {0, 0, 0});
-		TupleGenotype gt4 = new TupleGenotype(new Pair(0, 3), 3, new int[] {0, 0, 0});
-
-		tuples.add(new Tuple(lookup_table1, gt1.buildTupleCells()));
-		tuples.add(new Tuple(lookup_table2, gt2.buildTupleCells()));
-		tuples.add(new Tuple(lookup_table3, gt3.buildTupleCells()));
-		tuples.add(new Tuple(lookup_table4, gt4.buildTupleCells()));
-
-		this.tuples = tuples;
-	}
-
-	/**
-	 *
-	 */
-	public void makeTestTuples3() {
-		System.out.println("Making test tuples");
-		ArrayList<Tuple> tuples= new ArrayList<Tuple>();
-		double[] lookup_table1 = new double[(int) Math.pow(15, 6)];
-		double[] lookup_table2 = new double[(int) Math.pow(15, 6)];
-		double[] lookup_table3 = new double[(int) Math.pow(15, 6)];
-
-		double[] lookup_table4 = new double[(int) Math.pow(15, 6)];
-
-		ArrayList<Pair<Integer, Integer>> t1_cells = new ArrayList<>();
-		t1_cells.add(new Pair<>(0, 0));
-		t1_cells.add(new Pair<>(1, 0));
-		t1_cells.add(new Pair<>(1, 1));
-		t1_cells.add(new Pair<>(0, 1));
-		t1_cells.add(new Pair<>(0, 2));
-		t1_cells.add(new Pair<>(0, 3));
-		Tuple t1 = new Tuple(lookup_table1, t1_cells);
-
-		ArrayList<Pair<Integer, Integer>> t2_cells = new ArrayList<>();
-		t2_cells.add(new Pair<>(1, 0));
-		t2_cells.add(new Pair<>(2, 0));
-		t2_cells.add(new Pair<>(2, 1));
-		t2_cells.add(new Pair<>(1, 1));
-		t2_cells.add(new Pair<>(1, 2));
-		t2_cells.add(new Pair<>(1, 3));
-		Tuple t2 = new Tuple(lookup_table2, t2_cells);
-
-		ArrayList<Pair<Integer, Integer>> t3_cells = new ArrayList<>();
-		t3_cells.add(new Pair<>(0, 0));
-		t3_cells.add(new Pair<>(0, 1));
-		t3_cells.add(new Pair<>(0, 2));
-		t3_cells.add(new Pair<>(1, 2));
-		t3_cells.add(new Pair<>(1, 1));
-		t3_cells.add(new Pair<>(1, 0));
-		Tuple t3 = new Tuple(lookup_table3, t3_cells);
-
-		ArrayList<Pair<Integer, Integer>> t4_cells = new ArrayList<>();
-		t4_cells.add(new Pair<>(1, 0));
-		t4_cells.add(new Pair<>(1, 1));
-		t4_cells.add(new Pair<>(1, 2));
-		t4_cells.add(new Pair<>(2, 2));
-		t4_cells.add(new Pair<>(2, 1));
-		t4_cells.add(new Pair<>(2, 0));
-		Tuple t4 = new Tuple(lookup_table4, t4_cells);
-
-		tuples.add(t1);
-		tuples.add(t2);
-		tuples.add(t3);
-		tuples.add(t4);
-
-		this.tuples = tuples;
 	}
 
 	/**
@@ -449,11 +327,6 @@ public class GeneticAgent implements Agent, Runnable {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}	
-	}
-
-	@Override
-	public void run() {
-		// TODO Auto-generated method stub
 	}
 }
 

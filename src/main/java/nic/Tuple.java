@@ -11,15 +11,17 @@ public class Tuple implements Serializable {
 	private ArrayList<Pair<Integer, Integer>> tupleCells;
 	private ArrayList<Integer> tupleKeys; 
 	private double current_value;
+	private TupleGenotype genotype;
 
 	/**
 	 *
 	 * @param lookup
-	 * @param tuple_cells
+	 * @param genotype
 	 */
-	Tuple(double[] lookup, ArrayList<Pair<Integer, Integer>> tuple_cells) {
-		this.tupleLookupTable =lookup;
-		this.tupleCells = tuple_cells;
+	Tuple(double[] lookup, TupleGenotype genotype) {
+		this.tupleLookupTable = lookup;
+		this.genotype = genotype;
+		this.tupleCells = genotype.buildTupleCells();
 
 		tupleKeys = new ArrayList<>();
 		current_value = 0;
@@ -98,35 +100,5 @@ public class Tuple implements Serializable {
 
 			tupleKeys.clear();
 		}
-	}
-
-	/**
-	 *
-	 * @return
-	 */
-	public double getTupleValue() {
-		return current_value;
-	}
-
-	/**
-	 * this method is not used yet but it was meant for comparing tuple shapes to possibly share the lookup table between tuples. Should be useful in tuple evaluation.
-	 * @param another_tuple
-	 * @return
-	 */
-	public boolean compareShapes(ArrayList<Pair<Integer, Integer>> another_tuple) {
-
-		if (another_tuple.size() != tupleCells.size()) {
-			return false;
-		}
-
-		Pair <Integer, Integer> difference;
-		difference = new Pair<>(another_tuple.get(0).first() - tupleCells.get(0).first(), another_tuple.get(0).second() - tupleCells.get(0).second());
-		for (int i = 1; i < another_tuple.size(); i++) {
-			if (difference.first() != another_tuple.get(i).first() - tupleCells.get(i).first() || difference.second() != another_tuple.get(i).second() - tupleCells.get(i).second()) {
-				return false;
-			}
-		}
-
-		return true;
 	}
 }

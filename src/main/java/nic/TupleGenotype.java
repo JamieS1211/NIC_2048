@@ -10,47 +10,26 @@ public class TupleGenotype {
     public int startDirection;
     public int[] turns;
 
-    private int chrom_amount = 3;
-    private int[] board_size = {4, 4};
-
-    // Increasing index by 1 is a turn to left
-    public Pair<Integer, Integer> UP = new Pair<>(0, -1);
-    public Pair<Integer, Integer> LEFT = new Pair<>(-1, 0);
-    public Pair<Integer, Integer> DOWN = new Pair<>(0, 1);
-    public Pair<Integer, Integer> RIGHT = new Pair<>(1, 0);
-    public ArrayList<Pair<Integer, Integer>> directions = new ArrayList<>();
-
-    public int TURN_RIGHT = -1;
-    public int TURN_STRAIGHT = 0;
-    public int TURN_LEFT = 1;
-    public int[] turnDirections = {TURN_RIGHT, TURN_STRAIGHT, TURN_LEFT};
-
-    /**
-     * Private constructor to add directions
-     */
-    private TupleGenotype() {
-        this.directions.add(UP);
-        this.directions.add(LEFT);
-        this.directions.add(DOWN);
-        this.directions.add(RIGHT);
-    }
-
     /**
      * Create a new random tuple genotype of given size
      * @param tupleSize - Size of the tuple
      */
     TupleGenotype(int tupleSize) {
-        this();
-
         Random rand = new Random();
 
         this.startPosition = new Pair<>(rand.nextInt(3), rand.nextInt(3));
-        this.startDirection = rand.nextInt(directions.size());
+        this.startDirection = rand.nextInt(4);
         this.turns = new int[tupleSize - 1];
 
-        for (int i = 0; i < tupleSize; i++) {
-            this.turns[i] = rand.nextInt(turnDirections.length);
-        }
+        boolean valid;
+
+        do {
+            for (int i = 0; i < tupleSize - 1; i++) {
+                this.turns[i] = rand.nextInt(3) - 1;
+            }
+
+            valid = isTupleValid(this.buildTupleCells());
+        } while (!valid);
     }
 
     /**
@@ -60,8 +39,6 @@ public class TupleGenotype {
      * @param turns - List of turns to make
      */
     TupleGenotype(Pair<Integer, Integer> startPosition, int startDirection, int[] turns) {
-        this();
-
         this.startPosition = startPosition;
         this.startDirection = startDirection;
         this.turns = turns;
@@ -73,8 +50,6 @@ public class TupleGenotype {
      * @param parent2 - Parent 2
      */
     TupleGenotype(TupleGenotype parent1, TupleGenotype parent2) throws IllegalArgumentException {
-        this();
-
         if (parent1.turns.length != parent2.turns.length) {
             throw new IllegalArgumentException();
         }
@@ -102,46 +77,26 @@ public class TupleGenotype {
     void mutate() {
         Random rand = new Random();
 
-        int mutation = rand.nextInt(this.chrom_amount);
+        int mutation = rand.nextInt(3);
 
         switch (mutation) {
 
             case 0:
                 // Start Position
-                int xstart = rand.nextInt(this.board_size[0] - 1);
-                int ystart = rand.nextInt(this.board_size[1] - 1);
-                this.startPosition = new Pair<>(xstart, ystart);
-
+                this.startPosition = new Pair<>(rand.nextInt(3), rand.nextInt(3));
                 return;
 
             case 1:
                 // Start Direction
-                int direction = rand.nextInt(this.directions.size());
-                this.startDirection = direction;
+                this.startDirection = rand.nextInt(4);
 
                 return;
 
             case 2:
                 // Turns
-                int changing_turn = rand.nextInt(this.turnDirections.length);
-                this.turns[changing_turn] = rand.nextInt(this.turnDirections.length);
-
+                this.turns[rand.nextInt(3)] = rand.nextInt(3) - 1;
                 return;
         }
-    }
-
-    /**
-     * Print the tuple info
-     */
-    void print() {
-        System.out.println("Start Position: " + this.startPosition);
-        System.out.println("Start direction: " + this.startDirection);
-
-        for (int i = 0; i < this.turns.length; i++) {
-            System.out.println("Turn" + i + " : " + this.turnDirections[i]);
-        }
-
-        System.out.println();
     }
 
     /**
@@ -152,7 +107,7 @@ public class TupleGenotype {
     public boolean isTupleValid(ArrayList<Pair<Integer, Integer>> tupleCells) {
         // Check it doesn't go back on itself
         for (Pair<Integer, Integer> cell : tupleCells) {
-            if (cell.first() < 0 || cell.second() < 0) {
+            if (cell.first() < 0 || cell.first() > 3 || cell.second() < 0 || cell.second() > 3) {
                 return false;
             }
         }
@@ -167,7 +122,7 @@ public class TupleGenotype {
                 Pair<Integer, Integer> t2 = tupleCells.get(j);
 
                 if (t1.first() == t2.first()) {
-                    if (t2.second() == t2.second()) {
+                    if (t1.second() == t2.second()) {
                         return false;
                     }
                 }
@@ -190,8 +145,9 @@ public class TupleGenotype {
         tupleCells.add(currentPosition);
 
         for (int turn = 0; turn < this.turns.length; turn++) {
-            currentDirection = (currentDirection + this.turns[turn]) % 4;
-            currentPosition = new Pair<>(currentPosition.first() + directions.get(currentDirection).first(), currentPosition.second() + directions.get(currentDirection).second());
+            currentDirection = (currentDirection + this.turns[turn] + 4) % 4;
+
+            currentPosition = new Pair<>(currentPosition.first() + EnumAbsoluteDirections.getDirectionData(currentDirection).xDiff, currentPosition.second() + EnumAbsoluteDirections.getDirectionData(currentDirection).yDiff);
             tupleCells.add(currentPosition);
         }
 
